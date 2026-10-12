@@ -442,7 +442,7 @@ def _add_deleted_files_node(
 ) -> None:
     """A flat `$Recovered` child of the volume, one leaf per entry the
     walker's deleted-file enumeration yields: deleted_files() on NTFS/FAT32/
-    exFAT, recover_deleted() on YAFFS2/JFFS2/UBIFS (and UBI, for the UBIFS
+    FAT16/FAT12/exFAT, recover_deleted() on YAFFS2/JFFS2/UBIFS (and UBI, for the UBIFS
     volumes it holds) and QNX EFS -- the filesystems qnxprobe has this for. Not
     reassembled into the deleted files' original folders: that needs
     mapping each entry's `parent` handle back onto a live directory that
@@ -647,7 +647,7 @@ def _add_stream_nodes(
 
 
 def _check_cluster_chain(walker: Any, node: Any, size: int, got: int) -> None:
-    """Raise when a FAT32 or exFAT file read short because its cluster chain
+    """Raise when a FAT or exFAT file read short because its cluster chain
     ends before its recorded size.
 
     The directory entry records the size and the allocation table records the
@@ -829,9 +829,9 @@ def peek_deleted_file(walker: Any, entry: Any, size: int, n: int) -> bytes:
     """Read at most the first `n` bytes of a recovered deleted file.
 
     NTFS's read_deleted() chunks the same way read_file() does, so this
-    stays cheap there; FAT32/exFAT's read_deleted() builds the whole file
-    in memory before its one yield regardless, so this saves nothing for
-    those two (nor for the flash filesystems, whose read_deleted() rebuilds
+    stays cheap there; FAT's and exFAT's read_deleted() builds the whole
+    file in memory before its one yield regardless, so this saves nothing
+    for those (nor for the flash filesystems, whose read_deleted() rebuilds
     the file from its pages or nodes first) -- but a deleted-files listing is normally far smaller than
     a volume's live tree, so that's an acceptable, not a silent, cost.
     """

@@ -18,7 +18,7 @@ In the tables, a number is how many checks exist; **not tested** means there is 
 
 ## Overview
 
-241 checks in total.
+246 checks in total.
 
 ### Sources
 
@@ -54,8 +54,8 @@ In the tables, a number is how many checks exist; **not tested** means there is 
 |---|---|---|---|---|---|---|
 | [NTFS](#ntfs) | not tested | not tested | not tested | 6 | not tested | not tested |
 | [FAT32](#fat32) | not tested | not tested | not tested | 2 | not tested | not tested |
-| [FAT16](#fat16) | not tested | not tested | not tested | not tested | not tested | not tested |
-| [FAT12](#fat12) | not tested | not tested | not tested | not tested | not tested | not tested |
+| [FAT16](#fat16) | not tested | not tested | not tested | 3 | not tested | not tested |
+| [FAT12](#fat12) | not tested | not tested | not tested | 2 | not tested | not tested |
 | [exFAT](#exfat) | not tested | not tested | not tested | 4 | not tested | not tested |
 | [ext2/3/4](#ext234) | not tested | not tested | not tested | not tested | not tested | not tested |
 | [F2FS](#f2fs) | not tested | not tested | not tested | not tested | not tested | not tested |
@@ -322,11 +322,16 @@ No forensic checks.
 
 #### FAT16
 
-No forensic checks.
+- **Known-output Verification** — Every file on a FAT16 and a TFAT16 volume reads back at its path with the bytes hashed from the mounted volume ([test_raw_image_fat.py](../../crush/tests/test_raw_image_fat.py), `test_fat16_every_listed_file_reads_back_as_written`)
+- **Known-output Verification** — Three deliberately deleted files on a FAT16 and a TFAT16 volume must recover content exactly, per reference hashes ([test_raw_image_fat.py](../../crush/tests/test_raw_image_fat.py), `test_fat16_deleted_files_are_recovered`)
+- **Known-output Verification** — The folder a TFAT16 volume keeps its files under is shown as stored, with every file under it ([test_raw_image_fat.py](../../crush/tests/test_raw_image_fat.py), `test_transaction_safe_volume_keeps_its_files_under_one_root_folder`)
+- *Not tested:* Source Immutability, No Side Effects, Read-only Media, Completeness, Reproducibility
 
 #### FAT12
 
-No forensic checks.
+- **Known-output Verification** — Every file on a FAT12 volume reads back at its path with the bytes hashed from the mounted volume ([test_raw_image_fat.py](../../crush/tests/test_raw_image_fat.py), `test_fat12_every_listed_file_reads_back_as_written`)
+- **Known-output Verification** — Three deliberately deleted files on a FAT12 volume must recover content exactly, per reference hashes ([test_raw_image_fat.py](../../crush/tests/test_raw_image_fat.py), `test_fat12_deleted_files_are_recovered`)
+- *Not tested:* Source Immutability, No Side Effects, Read-only Media, Completeness, Reproducibility
 
 #### exFAT
 
