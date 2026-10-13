@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QMenu,
     QPushButton,
+    QSizePolicy,
     QTreeView,
     QVBoxLayout,
     QWidget,
@@ -262,40 +263,57 @@ class TreeViewer(QWidget):
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
 
-        # Toolbar
+        # Toolbar. With a Hex view it sits above the tree half only (so the
+        # filter stays next to the rows it filters) and takes two rows --
+        # Expand/Collapse, then search + Show Hex -- to stay narrow; without
+        # one it is a single full-width row as before.
+        has_hex = self._raw is not None
         toolbar = QWidget()
-        toolbar.setFixedHeight(36)
-        tb_layout = QHBoxLayout(toolbar)
-        tb_layout.setContentsMargins(8, 4, 8, 4)
-        tb_layout.setSpacing(8)
+        toolbar.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
+        tb_rows = QVBoxLayout(toolbar)
+        tb_rows.setContentsMargins(8, 4, 8, 4)
+        tb_rows.setSpacing(4)
+        buttons_row = QHBoxLayout()
+        buttons_row.setSpacing(8)
+        tb_rows.addLayout(buttons_row)
         self._expand_all_btn = QPushButton(translate("TreeViewer", "Expand All"))
         self._expand_all_btn.clicked.connect(self._expand_all)
-        tb_layout.addWidget(self._expand_all_btn)
+        buttons_row.addWidget(self._expand_all_btn)
         self._collapse_all_btn = QPushButton(translate("TreeViewer", "Collapse All"))
         self._collapse_all_btn.clicked.connect(self._collapse_all)
-        tb_layout.addWidget(self._collapse_all_btn)
-        tb_layout.addStretch()
+        buttons_row.addWidget(self._collapse_all_btn)
+        buttons_row.addStretch()
+        if has_hex:
+            tb_layout = QHBoxLayout()
+            tb_layout.setSpacing(8)
+            tb_rows.addLayout(tb_layout)
+        else:
+            tb_layout = buttons_row
         tb_layout.addWidget(QLabel(translate("TreeViewer", "Search:")))
 
         self._search = QLineEdit()
         self._search.setPlaceholderText(translate("TreeViewer", "Filter keys / values…"))
         self._search.setClearButtonEnabled(True)
-        self._search.setFixedWidth(200)
+        if has_hex:
+            self._search.setMinimumWidth(
+                self._search.fontMetrics().horizontalAdvance("0" * 20) + 12
+            )
+        else:
+            self._search.setFixedWidth(200)
         # Each filter pass walks the whole tree: wait for a pause in typing.
         self._filter_timer = QTimer(self)
         self._filter_timer.setSingleShot(True)
         self._filter_timer.setInterval(200)
         self._filter_timer.timeout.connect(lambda: self._apply_filter(self._search.text()))
         self._search.textChanged.connect(lambda _text: self._filter_timer.start())
-        tb_layout.addWidget(self._search)
+        tb_layout.addWidget(self._search, stretch=1 if has_hex else 0)
         self._hex_toggle_btn: QPushButton | None = None
-        if self._raw is not None:
+        if has_hex:
             self._hex_toggle_btn = QPushButton(translate("TreeViewer", "Show Hex"))
             self._hex_toggle_btn.clicked.connect(self._toggle_hex_view)
             tb_layout.addWidget(self._hex_toggle_btn)
             if self._initial_hex_visible:
                 self._hex_toggle_btn.setText(translate("TreeViewer", "Hide Hex"))
-        layout.addWidget(toolbar)
 
         # Tree view
         self._filter_text = ""
@@ -341,12 +359,14 @@ class TreeViewer(QWidget):
                 range_for_item=_byte_range_from_item,
                 highlight_ranges_for_item=_byte_highlight_ranges_from_item,
                 selection_changed=self._update_value_field,
+                header=toolbar,
                 footer=value_bar,
                 hex_visible=self._initial_hex_visible,
                 parent=self,
             )
             layout.addWidget(self._mapped_view, 1)
         else:
+            layout.addWidget(toolbar)
             layout.addWidget(self._tree, 1)
             layout.addWidget(value_bar)
             self._tree.selectionModel().selectionChanged.connect(self._update_value_field)
