@@ -17,11 +17,10 @@ All notable changes to Crush will be documented in this file.
 - Added to raw disk images -> Support for FAT16 and FAT12 volumes, with deleted-file recovery into `$Recovered`. ([@abrignoni](https://github.com/abrignoni), [#156](https://github.com/kalink0/crush-forensics/pull/156))
 - Added to raw disk images -> Support for Windows CE transaction-safe FAT (TFAT16 and TFAT32), read as FAT16 and FAT32. ([@abrignoni](https://github.com/abrignoni), [#156](https://github.com/kalink0/crush-forensics/pull/156))
 - Added to raw disk images -> Support for the logical volumes of an LVM2 volume group: linear (one or several segments), striped, and RAID1 or mirror. ([@abrignoni](https://github.com/abrignoni), [#160](https://github.com/kalink0/crush-forensics/pull/160))
-- Added to raw disk images -> Support for LUKS1 and LUKS2 containers, opened with their passphrase. ([@abrignoni](https://github.com/abrignoni), [#160](https://github.com/kalink0/crush-forensics/pull/160))
 - Added to raw disk images -> Support for XFS, Btrfs and ReFS 3.x volumes, with ReFS alternate data streams. ([@abrignoni](https://github.com/abrignoni), [#163](https://github.com/kalink0/crush-forensics/pull/163))
 - Added to raw disk images -> Support for LVM2 RAID4, RAID5, RAID6 and RAID10 logical volumes held in one image, with each volume's layout. ([@abrignoni](https://github.com/abrignoni), [#163](https://github.com/kalink0/crush-forensics/pull/163))
 - Added to raw disk images -> Support for showing how many damaged structures were skipped while listing an XFS, Btrfs or ReFS volume, and the first of them. ([@abrignoni](https://github.com/abrignoni), [#163](https://github.com/kalink0/crush-forensics/pull/163))
-- Added to raw disk images -> Support for unlocking BitLocker and encrypted APFS volumes inside the image with a password, recovery password or startup key file.
+- Added to raw disk images -> Support for unlocking BitLocker volumes, encrypted APFS volumes and LUKS1/LUKS2 containers inside the image with a password, recovery password, passphrase or startup key file.
 - Added to raw disk images -> Support for showing what the reader reports on each volume: its place in the image, encryption, an LVM2 volume's layout and the copy a RAID1 or mirror volume is read from.
 - Added to raw disk images -> Support for listing an LVM2 physical volume's free extents as readable regions of their own.
 - Added to the loading dialog -> Support for showing which step a disk image load is in, including the volume search.
