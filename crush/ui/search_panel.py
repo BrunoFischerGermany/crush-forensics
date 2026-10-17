@@ -26,6 +26,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from crush.core.magic import looks_like_media
 from crush.core.stored_times import MODIFIED
 from crush.core.ts_decode import unix_to_utc
 from crush.core.vfs import VFS, VFSNode
@@ -49,9 +50,10 @@ def _fmt_size(n: int) -> str:
     return str(n)
 
 
-def _fmt_ts(ts: float) -> str:
-    # 0 is the VFS's "no timestamp" value; negative (pre-1970) values are real.
-    if not ts:
+def _fmt_ts(ts: float | None) -> str:
+    # None is the VFS's "no timestamp" value; 0 and negative (pre-1970)
+    # values are real.
+    if ts is None:
         return ""
     dt = unix_to_utc(ts)
     if dt is None:
@@ -105,6 +107,10 @@ def _detect_type(peek: bytes, ext: str) -> str:
         # JPEG XL ISOBMFF container
         if len(peek) >= 12 and peek[:12] == b"\x00\x00\x00\x0C\x4A\x58\x4C\x20\x0D\x0A\x87\x0A":
             return "image"
+        # Audio / video, by the same rule the Media viewer is chosen by
+        # (images, checked above, keep their ISOBMFF brands).
+        if looks_like_media(peek):
+            return "media"
         # SQLite
         if len(peek) >= 16 and peek[:16] == b"SQLite format 3\x00":
             return "sqlite"
@@ -373,7 +379,7 @@ class SearchPanel(QWidget):
             size_item.setTextAlignment(Qt.AlignmentFlag.AlignRight | Qt.AlignmentFlag.AlignVCenter)
             size_item.setEditable(False)
 
-            reading = "" if node.modified else _modified_reading(node)
+            reading = "" if node.modified is not None else _modified_reading(node)
             if reading:
                 # No instant to sort by: sorted by its text, as stored.
                 ts_item = QStandardItem(
@@ -457,7 +463,11 @@ _TYPE_EXTENSIONS: dict[str, set[str]] = {
         "jpg", "jpeg", "png", "gif", "bmp", "webp", "tiff", "tif",
         "heic", "heif", "avif", "jxl", "atx",
     },
-    "media":   {"mp4", "mov", "avi", "mkv", "mp3", "m4a", "aac", "wav", "flac", "ogg"},
+    # The Media viewer's extensions (MediaParser.SUPPORTED_EXTENSIONS).
+    "media":   {
+        "mp3", "wav", "m4a", "aac", "flac", "ogg", "opus", "wma", "amr",
+        "mp4", "m4v", "mov", "mkv", "avi", "webm", "3gp", "3g2",
+    },
     "plist":   {"plist"},
     "json":    {"json"},
     "xml":     {"xml"},

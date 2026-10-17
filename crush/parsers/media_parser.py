@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from crush.core.issues import ParseIssue
+from crush.core.magic import looks_like_media
 from crush.core.vfs import VFS, VFSNode
 from crush.parsers.base import AbstractParser, ParseResult
 
@@ -82,12 +83,9 @@ class MediaParser(AbstractParser):
         ext = Path(path).suffix.lower()
         if ext in self.SUPPORTED_EXTENSIONS:
             return True
-        # Catch renamed audio files (e.g. voice notes saved as .bin)
-        if peek_bytes[:4] == _OGG_MAGIC:
-            return True
-        if peek_bytes[:5] == _AMR_MAGIC:
-            return True
-        return False
+        # Renamed, carved or exported without an extension (a voice note
+        # saved as .bin, a video named by its hash).
+        return looks_like_media(peek_bytes)
 
     def parse(self, node: VFSNode, vfs: VFS) -> ParseResult:
         raw = vfs.read(node)

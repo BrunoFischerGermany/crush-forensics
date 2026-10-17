@@ -34,7 +34,9 @@ from typing import TYPE_CHECKING, Any
 # wire the same two vendored libraries together.
 from crush.core.issues import ParseIssue
 from crush.core.load_phase import (
+    PHASE_DELETED_FILES,
     PHASE_OPEN_IMAGE,
+    PHASE_READ_FILESYSTEMS,
     PHASE_SEARCH_VOLUMES,
     PHASE_UNLOCK_VOLUMES,
     report_phase,
@@ -49,7 +51,12 @@ from crush.third_party.qnxprobe.qnxprobe import (  # noqa: E402
     ApfsWalker,
     BitLocker,
     ExfatWalker,
+    F2fsWalker,
+    Fat32Walker,
+    HfsPlusWalker,
     Luks,
+    NtfsWalker,
+    RefsWalker,
     identify_fs,
     unlock_apfs,
     unlock_bitlocker,
@@ -60,6 +67,26 @@ if TYPE_CHECKING:
     from crush.core.vfs import VFSNode
 
 _MAX_DEPTH = 64  # a directory this deep in a walk is a loop, not a directory
+
+# Walkers whose entry() time is 0 when the filesystem stores none, by
+# qnxprobe's own conversions: NTFS ("0 where the attribute is absent"), ReFS
+# (0 = not set, libfsrefs), F2FS, APFS ("0 when unset") and HFS+ ("0 when
+# unset or out of range"); FAT/exFAT (Fat16/Fat12 subclass Fat32Walker)
+# always give 0, as their entries store a reading, not an instant. Every
+# other walker's 0 is the stored time 1970-01-01 00:00:00 UTC.
+_ZERO_IS_NO_TIME = (
+    NtfsWalker, RefsWalker, F2fsWalker, ApfsWalker, HfsPlusWalker, Fat32Walker, ExfatWalker,
+)
+
+
+def _entry_time(walker: Any, value: Any) -> float | None:
+    """A walker's time as a VFSNode instant: None when it gives none (None,
+    or 0 from a walker whose 0 means unset), else the value -- 0 included."""
+    if not isinstance(value, (int, float)) or isinstance(value, bool):
+        return None
+    if value == 0 and isinstance(walker, _ZERO_IS_NO_TIME):
+        return None
+    return float(value)
 
 # A Linux md RAID member found on its own (qnxprobe volumes() kind "linux md
 # member"): the reader reads the array only when assembled from its members.
@@ -819,6 +846,7 @@ def _add_deleted_files_node(
     """
     from crush.core.vfs import VFSNode, join_notes
 
+    report_phase(PHASE_DELETED_FILES)
     try:
         entries = list((enumerate_deleted or walker.deleted_files)())
     except Exception as exc:
@@ -828,6 +856,8 @@ def _add_deleted_files_node(
             volume_node.status, ParseIssue("entry.raw_deleted_enum_failed", detail=str(exc)),
         ])
         return
+    finally:
+        report_phase(PHASE_READ_FILESYSTEMS)
     if not entries:
         return
 
@@ -845,7 +875,7 @@ def _add_deleted_files_node(
         mtime = getattr(entry, "mtime", None)
         recovered.children.append(VFSNode(
             name=unique_name, path=child_path, is_dir=False, size=entry.size or 0,
-            modified=float(mtime) if isinstance(mtime, (int, float)) else 0.0,
+            modified=_entry_time(walker, mtime),
         ))
         read_map[child_path] = _Entry(walker=walker, node=None, size=entry.size or 0, deleted=entry)
 
@@ -908,16 +938,17 @@ def _walk_into(
             ))
             read_map[child_path] = _Entry(walker=None, node=None, size=0, stored=b"")
             continue
-        mode, size, mtime = ent
+        mode, size, raw_mtime = ent
+        mtime = _entry_time(walker, raw_mtime)  # 0 is "no time" only where the walker says so
         if (mode & 0o170000) == qnxprobe.S_IFDIR:  # not just the bit: block devices and sockets share it
-            child_node = VFSNode(name=name, path=child_path, is_dir=True, modified=mtime or 0.0,
+            child_node = VFSNode(name=name, path=child_path, is_dir=True, modified=mtime,
                                  stored_times=times)
             children.append(child_node)
             _walk_into(walker, child, child_node, read_map, child_path, seen, depth + 1)
             _add_stream_nodes(walker, child, name, base_path, children, read_map)
         elif (mode & 0o170000) == 0o100000:  # regular files only
             child_node = VFSNode(
-                name=name, path=child_path, is_dir=False, size=size or 0, modified=mtime or 0.0,
+                name=name, path=child_path, is_dir=False, size=size or 0, modified=mtime,
                 stored_times=times,
             )
             children.append(child_node)
@@ -931,7 +962,7 @@ def _walk_into(
                 else ParseIssue("entry.special_raw", {"mode": f"{mode & 0o170000:o}"})
             )
             child_node = VFSNode(
-                name=name, path=child_path, is_dir=False, size=0, modified=mtime or 0.0,
+                name=name, path=child_path, is_dir=False, size=0, modified=mtime,
                 status=status, stored_times=times,
             )
             children.append(child_node)
