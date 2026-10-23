@@ -28,11 +28,15 @@ All notable changes to Crush will be documented in this file.
 - Fixed one `NSDate` outside the date range, or NaN, leaving a whole NSKeyedArchiver archive unresolved.
 - Fixed an XML plist with a UTF-8 BOM being identified as an XML document in the format information.
 - Fixed the BLOB Inspector's plist text reporting a recursion or index error instead of the cycle or missing reference in an NSKeyedArchiver archive.
+- Fixed HFS+ file names holding `:` in raw disk images being read as a folder path (`a:b.txt` showed as `a/b.txt`). ([@abrignoni](https://github.com/abrignoni), [#176](https://github.com/kalink0/crush-forensics/pull/176))
+- Fixed an E01 or L01 chunk table that fails its checksum being read as stored, which could put another chunk's data in its place; its table2 copy is read instead. ([@abrignoni](https://github.com/abrignoni), [#176](https://github.com/kalink0/crush-forensics/pull/176))
+- Fixed a VHDX whose log updated disk data being read without the update, and a QCOW reading a file of its backing file's name outside its folder ahead of the one beside it. ([@abrignoni](https://github.com/abrignoni), [#176](https://github.com/kalink0/crush-forensics/pull/176))
+- Fixed a split raw image whose segments are not one size being joined, which reads every byte after a cut segment at the wrong offset; it is now refused, naming the segments. ([@abrignoni](https://github.com/abrignoni), [#176](https://github.com/kalink0/crush-forensics/pull/176))
 
 ### Changed
 
 - View → Language lists each language by its own name only, e.g. "Deutsch".
-- Bundled [qnxprobe](https://github.com/abrignoni/qnxprobe) updated to v1.74 (from v1.72) and [ewfprobe](https://github.com/abrignoni/ewfprobe) to v0.14.0 (from v0.13.0).
+- Bundled [qnxprobe](https://github.com/abrignoni/qnxprobe) updated to v1.75 (from v1.72) and [ewfprobe](https://github.com/abrignoni/ewfprobe) to v0.15.0 (from v0.13.0).
 
 ## v0.23.0 - 2026-10-17
 
