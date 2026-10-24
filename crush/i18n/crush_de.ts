@@ -1749,19 +1749,19 @@ Die Datei ist möglicherweise urheberrechtlich geschützt, verschlüsselt oder n
         <translation>Magic eines Android-Sparse-Images (0xED26FF3A Little-Endian)</translation>
     </message>
     <message>
-        <source>The dominant embedded database on iOS, Android, macOS, and Windows. Used by virtually every app for messages, call logs, contacts, browser history, location data, and app state. Identified by a 16-byte magic string (&apos;SQLite format 3\000&apos;) at offset 0. 100-byte file header contains: page size, write version (rollback=1, WAL=2), encoding, and change counter. Key forensic recovery mechanisms: (1) Freelist — deleted pages retained in a free-page list; records survive until overwritten by new insertions. (2) Freeblocks and page slack space — deleted records within active pages may survive in freeblocks or partially in the unallocated area below the live cell pointer array. (3) WAL (Write-Ahead Log) — in WAL mode, the -wal file contains uncommitted and recently checkpointed pages; must be analysed alongside the main DB. WAL slack: after checkpoint, old pages remain in the WAL until overwritten from the start — prior database states are recoverable. CRITICAL: opening a WAL-mode database with a standard SQLite driver triggers a checkpoint, irreversibly committing and clearing the WAL — use read-only forensic tools or low-level parsing only. sqlite_sequence table gaps reveal deleted AUTOINCREMENT rows.</source>
-        <comment>SQLite Database</comment>
-        <translation>Die vorherrschende eingebettete Datenbank unter iOS, Android, macOS und Windows. Von praktisch jeder App verwendet, für Nachrichten, Anruflisten, Kontakte, Browserverlauf, Standortdaten und App-Zustand. Erkennbar an einem 16-Byte-Magic-String (&apos;SQLite format 3\000&apos;) an Offset 0. Der 100-Byte-Datei-Header enthält: Page-Größe, Write-Version (rollback=1, WAL=2), Kodierung und Change Counter. Wichtige forensische Wiederherstellungsmechanismen: (1) Freelist: Gelöschte Pages bleiben in einer Liste freier Pages erhalten; Datensätze überdauern, bis sie durch neue Einfügungen überschrieben werden. (2) Freeblocks und Page-Slack: Gelöschte Datensätze in aktiven Pages können in Freeblocks oder teilweise im Unallocated-Bereich unterhalb des aktuellen Cell Pointer Arrays erhalten bleiben. (3) WAL (Write-Ahead Log): Im WAL-Modus enthält die -wal-Datei nicht committete und kürzlich per Checkpoint übernommene Pages; sie muss zusammen mit der Hauptdatenbank analysiert werden. WAL slack: Nach einem Checkpoint bleiben alte Pages im WAL erhalten, bis sie vom Anfang her überschrieben werden, frühere Datenbankzustände sind wiederherstellbar. KRITISCH: Das Öffnen einer Datenbank im WAL-Modus mit einem Standard-SQLite-Treiber löst einen Checkpoint aus, der die Inhalte des WAL unumkehrbar in die Datenbank überträgt und den WAL leert. Nur forensische Tools mit Lesezugriff oder Low-Level-Parsing verwenden. Lücken in der Tabelle sqlite_sequence zeigen gelöschte AUTOINCREMENT-Zeilen.</translation>
-    </message>
-    <message>
         <source>SQLite magic string (&apos;SQLite format 3\x00&apos;)</source>
         <comment>SQLite Database</comment>
         <translation>SQLite-Magic-String (&apos;SQLite format 3\x00&apos;)</translation>
     </message>
     <message>
-        <source>Write-Ahead Log companion file for SQLite databases in WAL journal mode. Contains uncommitted database pages and, after checkpoint, WAL slack — old page versions that persist until overwritten from the start of the file. Must be analysed alongside the parent database file using the same schema. CRITICAL: opening the parent database with a standard SQLite driver triggers a checkpoint, committing and clearing the WAL — use read-only forensic tools only. Without the companion database, frames can still be decoded, but column names are only available from the schema. See SQLite Database entry for full forensic context.</source>
+        <source>The dominant embedded database on iOS, Android, macOS, and Windows. Used by virtually every app for messages, call logs, contacts, browser history, location data, and app state. Identified by a 16-byte magic string (&apos;SQLite format 3\000&apos;) at offset 0. 100-byte file header contains: page size, write version (rollback=1, WAL=2), encoding, and change counter. Key forensic recovery mechanisms: (1) Freelist — deleted pages retained in a free-page list; records survive until overwritten by new insertions. (2) Freeblocks and page slack space — deleted records within active pages may survive in freeblocks or partially in the unallocated area below the live cell pointer array. (3) WAL (Write-Ahead Log) — in WAL mode, the -wal file holds committed page versions not yet checkpointed into the main file, frames of a transaction still open when the file was captured, and recently checkpointed pages; must be analysed alongside the main DB. WAL slack: after checkpoint, old pages remain in the WAL until overwritten from the start — prior database states are recoverable. CRITICAL: opening a WAL-mode database with a standard SQLite driver triggers a checkpoint, irreversibly committing and clearing the WAL — use read-only forensic tools or low-level parsing only. sqlite_sequence table gaps reveal deleted AUTOINCREMENT rows.</source>
+        <comment>SQLite Database</comment>
+        <translation>Die vorherrschende eingebettete Datenbank unter iOS, Android, macOS und Windows. Von praktisch jeder App verwendet, für Nachrichten, Anruflisten, Kontakte, Browserverlauf, Standortdaten und App-Zustand. Erkennbar an einem 16-Byte-Magic-String (&apos;SQLite format 3\000&apos;) an Offset 0. Der 100-Byte-Datei-Header enthält: Page-Größe, Write-Version (rollback=1, WAL=2), Kodierung und Change Counter. Wichtige forensische Wiederherstellungsmechanismen: (1) Freelist: Gelöschte Pages bleiben in einer Liste freier Pages erhalten; Datensätze überdauern, bis sie durch neue Einfügungen überschrieben werden. (2) Freeblocks und Page-Slack: Gelöschte Datensätze in aktiven Pages können in Freeblocks oder teilweise im Unallocated-Bereich unterhalb des aktuellen Cell Pointer Arrays erhalten bleiben. (3) WAL (Write-Ahead Log): Im WAL-Modus enthält die -wal-Datei committete Page-Versionen, die noch nicht per Checkpoint in die Hauptdatei übernommen wurden, Frames einer Transaktion, die bei der Sicherung noch offen war, und kürzlich per Checkpoint übernommene Pages; sie muss zusammen mit der Hauptdatenbank analysiert werden. WAL slack: Nach einem Checkpoint bleiben alte Pages im WAL erhalten, bis sie vom Anfang her überschrieben werden, frühere Datenbankzustände sind wiederherstellbar. KRITISCH: Das Öffnen einer Datenbank im WAL-Modus mit einem Standard-SQLite-Treiber löst einen Checkpoint aus, der die Inhalte des WAL unumkehrbar in die Datenbank überträgt und den WAL leert. Nur forensische Tools mit Lesezugriff oder Low-Level-Parsing verwenden. Lücken in der Tabelle sqlite_sequence zeigen gelöschte AUTOINCREMENT-Zeilen.</translation>
+    </message>
+    <message>
+        <source>Write-Ahead Log companion file for SQLite databases in WAL journal mode. Contains committed page versions not yet checkpointed into the database file, frames of a transaction still open when the file was captured, and, after checkpoint, WAL slack — old page versions that persist until overwritten from the start of the file. Must be analysed alongside the parent database file using the same schema. CRITICAL: opening the parent database with a standard SQLite driver triggers a checkpoint, committing and clearing the WAL — use read-only forensic tools only. Without the companion database, frames can still be decoded, but column names are only available from the schema. See SQLite Database entry for full forensic context.</source>
         <comment>SQLite WAL</comment>
-        <translation>Write-Ahead-Log-Begleitdatei für SQLite-Datenbanken im Journal-Modus WAL. Enthält nicht committete Datenbank-Pages und nach einem Checkpoint WAL slack: alte Page-Versionen, die erhalten bleiben, bis sie vom Dateianfang her überschrieben werden. Muss zusammen mit der zugehörigen Datenbankdatei mit demselben Schema analysiert werden. KRITISCH: Das Öffnen der zugehörigen Datenbank mit einem Standard-SQLite-Treiber löst einen Checkpoint aus, der die Inhalte des WAL in die Datenbank überträgt und den WAL leert. Nur forensische Tools mit Lesezugriff verwenden. Ohne die zugehörige Datenbank lassen sich die Frames trotzdem dekodieren, Spaltennamen sind aber nur aus dem Schema verfügbar. Den vollständigen forensischen Kontext enthält der Eintrag SQLite Database.</translation>
+        <translation>Write-Ahead-Log-Begleitdatei für SQLite-Datenbanken im Journal-Modus WAL. Enthält committete Page-Versionen, die noch nicht per Checkpoint in die Datenbankdatei übernommen wurden, Frames einer Transaktion, die bei der Sicherung noch offen war, und nach einem Checkpoint WAL slack: alte Page-Versionen, die erhalten bleiben, bis sie vom Dateianfang her überschrieben werden. Muss zusammen mit der zugehörigen Datenbankdatei mit demselben Schema analysiert werden. KRITISCH: Das Öffnen der zugehörigen Datenbank mit einem Standard-SQLite-Treiber löst einen Checkpoint aus, der die Inhalte des WAL in die Datenbank überträgt und den WAL leert. Nur forensische Tools mit Lesezugriff verwenden. Ohne die zugehörige Datenbank lassen sich die Frames trotzdem dekodieren, Spaltennamen sind aber nur aus dem Schema verfügbar. Den vollständigen forensischen Kontext enthält der Eintrag SQLite Database.</translation>
     </message>
     <message>
         <source>SQLite WAL magic 0x377F0682 (checksums computed little-endian)</source>
@@ -3923,6 +3923,10 @@ Die Datei ist möglicherweise urheberrechtlich geschützt, verschlüsselt oder n
         <translation>Kodierung</translation>
     </message>
     <message>
+        <source>Invalid</source>
+        <translation>Ungültig</translation>
+    </message>
+    <message>
         <source>db file</source>
         <translation>db-Datei</translation>
     </message>
@@ -4403,12 +4407,28 @@ Die Datei ist möglicherweise urheberrechtlich geschützt, verschlüsselt oder n
         <translation>Frames jenseits der letzten Commit-Markierung – während einer Transaktion erfasst</translation>
     </message>
     <message>
+        <source>WAL invalid frames</source>
+        <translation>Ungültige WAL-Frames</translation>
+    </message>
+    <message>
+        <source>Salt-valid frames outside the log SQLite reads — the frame&apos;s own checksum or an earlier frame&apos;s checksum or salts do not match, or the WAL header is not valid (checksum or page size). A transaction still open when the file was captured also leaves this: SQLite rewrites its frames in place and updates the checksums only at commit</source>
+        <translation>Frames mit gültigen Salts außerhalb des Logs, das SQLite liest: Die Prüfsumme des Frames selbst oder die Prüfsumme bzw. die Salts eines früheren Frames stimmen nicht, oder der WAL-Header ist nicht gültig (Prüfsumme oder Page-Größe). Eine bei der Sicherung noch offene Transaktion hinterlässt das ebenfalls: SQLite schreibt ihre Frames an Ort und Stelle neu und aktualisiert die Prüfsummen erst beim Commit</translation>
+    </message>
+    <message>
         <source>WAL slack frames</source>
         <translation>WAL-Slack-Frames</translation>
     </message>
     <message>
         <source>Salt-mismatch frames from a previous WAL cycle — reused WAL space</source>
         <translation>Frames mit Salt-Mismatch aus einem früheren WAL-Zyklus – wiederverwendeter WAL-Speicherplatz</translation>
+    </message>
+    <message>
+        <source>WAL log end</source>
+        <translation>WAL-Log-Ende</translation>
+    </message>
+    <message>
+        <source>Where the log SQLite reads ends; frames from there on are not part of the current database state</source>
+        <translation>Wo das Log endet, das SQLite liest; Frames ab dort gehören nicht zum aktuellen Datenbankzustand</translation>
     </message>
     <message>
         <source>Journal file size (B)</source>
@@ -6450,6 +6470,10 @@ Wenn Sie &quot;Nein&quot; wählen, wird er stattdessen als normaler Ordner geöf
         <translation>Geprüfte Bytes</translation>
     </message>
     <message>
+        <source>Invalid</source>
+        <translation>Ungültig</translation>
+    </message>
+    <message>
         <source>JavaScript</source>
         <translation>JavaScript</translation>
     </message>
@@ -6490,6 +6514,10 @@ Wenn Sie &quot;Nein&quot; wählen, wird er stattdessen als normaler Ordner geöf
         <translation>Live</translation>
     </message>
     <message>
+        <source>Log end</source>
+        <translation>Log-Ende</translation>
+    </message>
+    <message>
         <source>Log format</source>
         <translation>Log-Format</translation>
     </message>
@@ -6519,7 +6547,7 @@ Wenn Sie &quot;Nein&quot; wählen, wird er stattdessen als normaler Ordner geöf
     </message>
     <message>
         <source>NSDate kept as stored</source>
-        <translation type="unfinished"></translation>
+        <translation>NSDate wie gespeichert belassen</translation>
     </message>
     <message>
         <source>Nesting</source>
@@ -7195,6 +7223,26 @@ Wenn Sie &quot;Nein&quot; wählen, wird er stattdessen als normaler Ordner geöf
         <source>Shown standalone (no companion database opened alongside it), so rows are raw decoded values, not resolved to real column names. Open the companion database normally instead to see this content with column names, table attribution, and (for Active frames) merged transparently into the live table view, plus this same per-frame inventory in its own &apos;WAL Frames&apos; tab.</source>
         <comment>sqlite_wal.standalone</comment>
         <translation>Eigenständig angezeigt (ohne dazu geöffnete Begleitdatenbank), daher sind die Zeilen roh dekodierte Werte ohne echte Spaltennamen. Öffnen Sie stattdessen die Begleitdatenbank normal, um diesen Inhalt mit Spaltennamen und Tabellenzuordnung zu sehen, bei aktiven Frames transparent in die Live-Tabellenansicht übernommen, sowie dieselbe Übersicht pro Frame auf der eigenen Registerkarte „WAL-Frames“.</translation>
+    </message>
+    <message>
+        <source>The WAL header checksum does not match, so SQLite ignores the whole file: no frame is part of the current database state</source>
+        <comment>sqlite_wal.header_checksum_mismatch</comment>
+        <translation>Die Prüfsumme des WAL-Headers stimmt nicht, daher ignoriert SQLite die ganze Datei: Kein Frame gehört zum aktuellen Datenbankzustand</translation>
+    </message>
+    <message>
+        <source>After the checksum mismatch at frame {frame:,}; SQLite stops reading the log there</source>
+        <comment>sqlite_wal.frame_after_checksum_mismatch</comment>
+        <translation>Nach der Prüfsummenabweichung bei Frame {frame:,}; SQLite hört dort auf, das Log zu lesen</translation>
+    </message>
+    <message>
+        <source>After the salt mismatch at frame {frame:,}; SQLite stops reading the log there</source>
+        <comment>sqlite_wal.frame_after_salt_mismatch</comment>
+        <translation>Nach der Salt-Abweichung bei Frame {frame:,}; SQLite hört dort auf, das Log zu lesen</translation>
+    </message>
+    <message>
+        <source>At the last full frame: every frame&apos;s salts and checksum match</source>
+        <comment>sqlite_wal.log_end_file</comment>
+        <translation>Beim letzten vollständigen Frame: Salts und Prüfsumme aller Frames stimmen</translation>
     </message>
     <message>
         <source>Yes (AES-256, key supplied)</source>
@@ -8084,7 +8132,7 @@ Wenn Sie &quot;Nein&quot; wählen, wird er stattdessen als normaler Ordner geöf
     <message>
         <source>{count:,} length-delimited field(s) decode both as a nested message and as UTF-8 text; wire type 2 doesn&apos;t record which it is. Both readings are shown as candidates (heuristic), neither as the field&apos;s value</source>
         <comment>protobuf.ambiguous_payloads</comment>
-        <translation type="unfinished"></translation>
+        <translation>{count:,} längenbegrenzte(s) Feld(er) lassen sich sowohl als verschachtelte Nachricht als auch als UTF-8-Text dekodieren; Wire-Type 2 legt nicht fest, welches davon vorliegt. Beide Lesarten werden als Kandidaten angezeigt (Heuristik), keine als Wert des Feldes</translation>
     </message>
     <message>
         <source>{count:,} of {total:,} data files could not be read whole; Overview → Read problems says why</source>
@@ -8362,44 +8410,74 @@ Wenn Sie &quot;Nein&quot; wählen, wird er stattdessen als normaler Ordner geöf
         <translation>PNG-eXIf-Chunk noch nicht geprüft; tEXt-Chunks werden unter „PNG-Text“ angezeigt, zTXt- und iTXt-Chunks werden nicht gelesen</translation>
     </message>
     <message>
+        <source>The WAL header declares a page size of {page_size:,} B, not a power of two from 512 to 65,536, so SQLite ignores the whole file: no frame is part of the current database state</source>
+        <comment>sqlite_wal.header_page_size_invalid</comment>
+        <translation>Der WAL-Header gibt eine Page-Größe von {page_size:,} B an, keine Zweierpotenz von 512 bis 65.536, daher ignoriert SQLite die ganze Datei: Kein Frame gehört zum aktuellen Datenbankzustand</translation>
+    </message>
+    <message>
+        <source>Frame checksum does not match; SQLite stops reading the log before this frame. A transaction still open when the file was captured also leaves this: SQLite rewrites its frames in place and updates the checksums only at commit</source>
+        <comment>sqlite_wal.frame_checksum_mismatch</comment>
+        <translation>Die Frame-Prüfsumme stimmt nicht; SQLite hört vor diesem Frame auf, das Log zu lesen. Eine bei der Sicherung noch offene Transaktion hinterlässt das ebenfalls: SQLite schreibt ihre Frames an Ort und Stelle neu und aktualisiert die Prüfsummen erst beim Commit</translation>
+    </message>
+    <message>
+        <source>The WAL header is not valid; SQLite ignores the whole file</source>
+        <comment>sqlite_wal.frame_after_header_mismatch</comment>
+        <translation>Der WAL-Header ist nicht gültig; SQLite ignoriert die ganze Datei</translation>
+    </message>
+    <message>
+        <source>At frame {frame:,}: its salts do not match the WAL header; SQLite reads no frame from there on</source>
+        <comment>sqlite_wal.log_end_salt</comment>
+        <translation>Bei Frame {frame:,}: Seine Salts stimmen nicht mit dem WAL-Header überein; SQLite liest ab dort keinen Frame mehr</translation>
+    </message>
+    <message>
+        <source>At frame {frame:,}: its checksum does not match; SQLite reads no frame from there on. A transaction still open when the file was captured also leaves this: SQLite rewrites its frames in place and updates the checksums only at commit</source>
+        <comment>sqlite_wal.log_end_checksum</comment>
+        <translation>Bei Frame {frame:,}: Seine Prüfsumme stimmt nicht; SQLite liest ab dort keinen Frame mehr. Eine bei der Sicherung noch offene Transaktion hinterlässt das ebenfalls: SQLite schreibt ihre Frames an Ort und Stelle neu und aktualisiert die Prüfsummen erst beim Commit</translation>
+    </message>
+    <message>
+        <source>Before frame 1: the WAL header is not valid, so SQLite reads no frame</source>
+        <comment>sqlite_wal.log_end_header</comment>
+        <translation>Vor Frame 1: Der WAL-Header ist nicht gültig, daher liest SQLite keinen Frame</translation>
+    </message>
+    <message>
         <source>XML (NSKeyedArchiver — deserialization failed)</source>
         <comment>plist.format_nska_xml_failed</comment>
-        <translation type="unfinished"></translation>
+        <translation>XML (NSKeyedArchiver, Deserialisierung fehlgeschlagen)</translation>
     </message>
     <message>
         <source>{count:,} (NS.time is not a representable date, so the NSDate is shown as stored)</source>
         <comment>plist.nska_dates_kept</comment>
-        <translation type="unfinished"></translation>
+        <translation>{count:,} (NS.time ist kein darstellbares Datum, daher wird das NSDate wie gespeichert angezeigt)</translation>
     </message>
     <message>
         <source>Not decoded: the bytes start like a plist but can&apos;t be read as one: {detail}</source>
         <comment>plist.embedded_failed</comment>
-        <translation type="unfinished"></translation>
+        <translation>Nicht dekodiert: Die Bytes beginnen wie eine Plist, lassen sich aber nicht als solche lesen: {detail}</translation>
     </message>
     <message>
         <source>NSKeyedArchiver deserialization failed: {detail}. Inspect BLOB on the bytes shows the archive as stored</source>
         <comment>plist.embedded_nska_failed</comment>
-        <translation type="unfinished"></translation>
+        <translation>NSKeyedArchiver-Deserialisierung fehlgeschlagen: {detail}. „BLOB prüfen“ auf den Bytes zeigt das Archiv wie gespeichert</translation>
     </message>
     <message>
         <source>Not resolved: {count:,} reference(s) point past the end of $objects. Inspect BLOB on the bytes shows the archive as stored</source>
         <comment>plist.embedded_nska_missing_refs</comment>
-        <translation type="unfinished"></translation>
+        <translation>Nicht aufgelöst: {count:,} Referenz(en) zeigen über das Ende von $objects hinaus. „BLOB prüfen“ auf den Bytes zeigt das Archiv wie gespeichert</translation>
     </message>
     <message>
         <source>Not resolved: an object reaches itself through its references (a cycle). Inspect BLOB on the bytes shows the archive as stored</source>
         <comment>plist.embedded_nska_cycle</comment>
-        <translation type="unfinished"></translation>
+        <translation>Nicht aufgelöst: Ein Objekt erreicht über seine Referenzen sich selbst (Zyklus). „BLOB prüfen“ auf den Bytes zeigt das Archiv wie gespeichert</translation>
     </message>
     <message>
         <source>Not resolved: {count:,} reference(s) point past the end of $objects, so below is the archive&apos;s undecoded object table</source>
         <comment>plist.nska_missing_refs_text</comment>
-        <translation type="unfinished"></translation>
+        <translation>Nicht aufgelöst: {count:,} Referenz(en) zeigen über das Ende von $objects hinaus, daher folgt unten die nicht dekodierte Objekttabelle des Archivs</translation>
     </message>
     <message>
         <source>Not resolved: an object reaches itself through its references (a cycle), so below is the archive&apos;s undecoded object table</source>
         <comment>plist.nska_cycle_text</comment>
-        <translation type="unfinished"></translation>
+        <translation>Nicht aufgelöst: Ein Objekt erreicht über seine Referenzen sich selbst (Zyklus), daher folgt unten die nicht dekodierte Objekttabelle des Archivs</translation>
     </message>
     <message>
         <source>Payload column: schema-less rendering (heuristic), valid UTF-8 shown as text and 64/32-bit fields as double/float. The selected record&apos;s payload is shown below the table with every candidate reading of each field</source>
@@ -10352,6 +10430,14 @@ der Plattform), sodass der KDF zur Verlängerung der Passphrase für sie nur unn
         <translation>Doppelklick auf eine Zeile öffnet die Page im Rohformat in der Hex-Ansicht — Klick auf eine Zelle der Spalte „Inhalt“ zeigt unten den vollständigen dekodierten Wert</translation>
     </message>
     <message>
+        <source>{frames} frames, {rows} rows</source>
+        <translation>{frames} Frames, {rows} Zeilen</translation>
+    </message>
+    <message>
+        <source>frames: {breakdown}</source>
+        <translation>Frames: {breakdown}</translation>
+    </message>
+    <message>
         <source>{count} checksum mismatch</source>
         <translation>{count} Prüfsummenfehler</translation>
     </message>
@@ -10825,7 +10911,7 @@ Gesamt: {total:.2f} s</translation>
     <name>TreeViewer</name>
     <message>
         <source>decoded ({kind})</source>
-        <translation type="unfinished"></translation>
+        <translation>dekodiert ({kind})</translation>
     </message>
     <message>
         <source>Expand All</source>

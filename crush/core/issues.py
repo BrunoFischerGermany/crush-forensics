@@ -388,6 +388,64 @@ MESSAGES: dict[str, str] = {
         "table view, plus this same per-frame inventory in its own 'WAL Frames' tab.",
         "sqlite_wal.standalone",
     ),
+    "sqlite_wal.header_checksum_mismatch": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The WAL header checksum does not match, so SQLite ignores the whole file: "
+        "no frame is part of the current database state",
+        "sqlite_wal.header_checksum_mismatch",
+    ),
+    "sqlite_wal.header_page_size_invalid": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The WAL header declares a page size of {page_size:,} B, not a power of two "
+        "from 512 to 65,536, so SQLite ignores the whole file: no frame is part of "
+        "the current database state",
+        "sqlite_wal.header_page_size_invalid",
+    ),
+    "sqlite_wal.frame_checksum_mismatch": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Frame checksum does not match; SQLite stops reading the log before this frame. "
+        "A transaction still open when the file was captured also leaves this: SQLite "
+        "rewrites its frames in place and updates the checksums only at commit",
+        "sqlite_wal.frame_checksum_mismatch",
+    ),
+    "sqlite_wal.frame_after_checksum_mismatch": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "After the checksum mismatch at frame {frame:,}; SQLite stops reading the log there",
+        "sqlite_wal.frame_after_checksum_mismatch",
+    ),
+    "sqlite_wal.frame_after_salt_mismatch": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "After the salt mismatch at frame {frame:,}; SQLite stops reading the log there",
+        "sqlite_wal.frame_after_salt_mismatch",
+    ),
+    "sqlite_wal.frame_after_header_mismatch": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The WAL header is not valid; SQLite ignores the whole file",
+        "sqlite_wal.frame_after_header_mismatch",
+    ),
+    "sqlite_wal.log_end_salt": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "At frame {frame:,}: its salts do not match the WAL header; SQLite reads no frame "
+        "from there on",
+        "sqlite_wal.log_end_salt",
+    ),
+    "sqlite_wal.log_end_checksum": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "At frame {frame:,}: its checksum does not match; SQLite reads no frame from there "
+        "on. A transaction still open when the file was captured also leaves this: SQLite "
+        "rewrites its frames in place and updates the checksums only at commit",
+        "sqlite_wal.log_end_checksum",
+    ),
+    "sqlite_wal.log_end_file": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "At the last full frame: every frame's salts and checksum match",
+        "sqlite_wal.log_end_file",
+    ),
+    "sqlite_wal.log_end_header": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Before frame 1: the WAL header is not valid, so SQLite reads no frame",
+        "sqlite_wal.log_end_header",
+    ),
     # -- Realm ------------------------------------------------------------
     "realm.encrypted_key_supplied": QT_TRANSLATE_NOOP(
         "ParseIssue",
