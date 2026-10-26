@@ -2,13 +2,16 @@
 
 All notable changes to Crush will be documented in this file.
 
-## Unreleased
+## v0.24.0 - 2026-10-26
+
+**Focus: German as the first translation; NSKeyedArchiver resolution extended to all $top keys, XML archives and embedded plists; the BLOB Inspector shows Protobuf in the Protobuf viewer's tree; SQLite WAL frames used only when SQLite would use them; qnxprobe v1.75 / ewfprobe v0.15 with macOS compressed files and more robust image handling.**
 
 ### New Features
 
 - Added to the user interface -> Support for German. ([@BrunoFischerGermany](https://github.com/BrunoFischerGermany), [#170](https://github.com/kalink0/crush-forensics/pull/170))
 - Added to View → Language -> Support for restarting Crush right away to apply the chosen language.
 - Added to the Format Reference site -> Support for German, with any text not yet translated shown in English and marked.
+- Added to the Format Reference -> Support for links to the matching [4n6 Notes](https://4n6.be-binary.de/) pages. ([#175](https://github.com/kalink0/crush-forensics/pull/175))
 - Added to raw disk images -> Support for macOS compressed files on APFS and HFS+ (zlib, LZVN, LZFSE and stored), read as macOS reads them. A file compressed with LZBITMAP is listed and refused with the reason. ([@abrignoni](https://github.com/abrignoni), [#172](https://github.com/kalink0/crush-forensics/pull/172))
 - Added to raw disk images -> Support for naming acquisition chunks whose stored data ran out, which are read with zeros, on the source and in Verify Acquisition Hash. ([@abrignoni](https://github.com/abrignoni), [#172](https://github.com/kalink0/crush-forensics/pull/172))
 - Added to the BLOB Inspector -> Support for showing Protobuf, schema decodes included, in the Protobuf viewer's tree, with its text and JSON export for Copy and Export.
