@@ -1333,6 +1333,628 @@ MESSAGES: dict[str, str] = {
         "as candidates (heuristic), neither as the field's value",
         "protobuf.ambiguous_payloads",
     ),
+    # -- Chromium Disk Cache ----------------------------------------------
+    "chromium_cache.file_unreadable": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Could not be read: {detail}",
+        "chromium_cache.file_unreadable",
+    ),
+    "chromium_cache.files_unreadable": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "{count:,} file(s) couldn't be read; see Read problems in the Overview",
+        "chromium_cache.files_unreadable",
+    ),
+    "chromium_cache.file_not_recognised": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Not a file of the cache's format (no Simple or Blockfile magic, not addressed by an entry)",
+        "chromium_cache.file_not_recognised",
+    ),
+    "chromium_cache.file_missing": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "{name} is addressed by the cache but not in the folder",
+        "chromium_cache.file_missing",
+    ),
+    "chromium_cache.file_too_short": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "File too short for its header ({size:,} B)",
+        "chromium_cache.file_too_short",
+    ),
+    "chromium_cache.both_formats": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The folder holds files of both cache formats (Simple and Blockfile); both are read",
+        "chromium_cache.both_formats",
+    ),
+    "chromium_cache.second_index": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "A further index file ({name}) wasn't used: one index is read per format",
+        "chromium_cache.second_index",
+    ),
+    "chromium_cache.no_entries": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "No entries: the folder holds no entry file, and the index reaches no entry record",
+        "chromium_cache.no_entries",
+    ),
+    "chromium_cache.no_orphans_simple": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "None found: every hash the index lists has an entry file here (or there is no index)",
+        "chromium_cache.no_orphans_simple",
+    ),
+    "chromium_cache.no_orphans_blockfile": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "None found: no block the allocation bitmaps mark free holds an entry record whose stored "
+        "key hash matches its key",
+        "chromium_cache.no_orphans_blockfile",
+    ),
+    "chromium_cache.entry_alone": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Entry file opened on its own: the cache's other files of this entry, its index record "
+        "and the cache kind from the folder aren't read -- open the cache folder for those",
+        "chromium_cache.entry_alone",
+    ),
+    "chromium_cache.index_alone": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Index opened on its own: its records are listed, the entry files aren't checked -- "
+        "open the cache folder for those",
+        "chromium_cache.index_alone",
+    ),
+    "chromium_cache.marker_alone": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Backend marker of a Simple cache (holds only magic and version) -- open the cache folder",
+        "chromium_cache.marker_alone",
+    ),
+    "chromium_cache.version_unexpected": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Version {version}, Chromium writes version {expected}; read with that version's layout",
+        "chromium_cache.version_unexpected",
+    ),
+    "chromium_cache.fake_index_version": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Backend marker version {version}: outside the versions Chromium opens (8 and 9)",
+        "chromium_cache.fake_index_version",
+    ),
+    "chromium_cache.key_past_end": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Key length {length:,} reaches past the file's end ({size:,} B); the entry isn't read",
+        "chromium_cache.key_past_end",
+    ),
+    "chromium_cache.header_and_key_only": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The file holds only the header and the key (version {version}): no EOF record, no streams",
+        "chromium_cache.header_and_key_only",
+    ),
+    "chromium_cache.eof_missing": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "No EOF record at the file's end: the streams' sizes aren't known, the streams aren't read",
+        "chromium_cache.eof_missing",
+    ),
+    "chromium_cache.eof_magic_wrong": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Final magic doesn't match",
+        "chromium_cache.eof_magic_wrong",
+    ),
+    "chromium_cache.stream1_eof_missing": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "No EOF record for stream 1 where stream 0's size ({stream0:,} B) puts it; the streams "
+        "aren't read",
+        "chromium_cache.stream1_eof_missing",
+    ),
+    "chromium_cache.key_sha256_mismatch": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The stored SHA-256 of the key doesn't match the key in the header",
+        "chromium_cache.key_sha256_mismatch",
+    ),
+    "chromium_cache.crc_mismatch": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "doesn't match (stored {stored})",
+        "chromium_cache.crc_mismatch",
+    ),
+    "chromium_cache.sparse_cut_off": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Sparse range at offset {offset:,} is cut off by the file's end",
+        "chromium_cache.sparse_cut_off",
+    ),
+    "chromium_cache.sparse_magic_wrong": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "No sparse range header at offset {offset:,}; reading the ranges stopped there",
+        "chromium_cache.sparse_magic_wrong",
+    ),
+    "chromium_cache.name_hash_mismatch": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "File name {name} doesn't carry the hash of the key the file holds",
+        "chromium_cache.name_hash_mismatch",
+    ),
+    "chromium_cache.duplicate_role": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "{name} holds the same key and the same kind of file as another file of this entry; "
+        "it is listed in the Overview, not read into the entry",
+        "chromium_cache.duplicate_role",
+    ),
+    "chromium_cache.doomed_simple_file": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Doomed: Chromium renamed the file to todelete_… to delete it",
+        "chromium_cache.doomed_simple_file",
+    ),
+    "chromium_cache.not_in_index": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Not listed in the index (index written before the entry, or the entry not yet flushed)",
+        "chromium_cache.not_in_index",
+    ),
+    "chromium_cache.index_crc_mismatch": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "doesn't match: Chromium discards such an index and rebuilds it from the files; its "
+        "records are shown as stored",
+        "chromium_cache.index_crc_mismatch",
+    ),
+    "chromium_cache.index_entry_size_rejected": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Record(s) {records}: the packed entry size field doesn't fit in 38 bits -- Chromium "
+        "rejects the whole index on reading such a record and rebuilds it from the files; all "
+        "records are shown as stored",
+        "chromium_cache.index_entry_size_rejected",
+    ),
+    "chromium_cache.index_record_size_rejected": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The packed entry size field doesn't fit in 38 bits: Chromium rejects the whole index "
+        "because of this record",
+        "chromium_cache.index_record_size_rejected",
+    ),
+    "chromium_cache.index_in_opened_folder": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The index lies in the opened folder itself, not in an index-dir subfolder: records are "
+        "matched to the entry files in this folder by key hash; a record without one is listed "
+        "with its entry files not checked, since Chromium keeps them in the folder above "
+        "index-dir -- open that cache folder for those",
+        "chromium_cache.index_in_opened_folder",
+    ),
+    "chromium_cache.index_version": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Index version {version}: outside the versions Chromium reads (8 and 9)",
+        "chromium_cache.index_version",
+    ),
+    "chromium_cache.index_field_both": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Heuristic: the cache type isn't known from the entries (no HTTP or Code Cache key, no "
+        "CacheStorage index.txt), so the index's first record field is shown both ways -- as the "
+        "last-used time (most cache types) and as the trailer prefetch size (net::APP_CACHE: "
+        "CacheStorage, Service Worker scripts)",
+        "chromium_cache.index_field_both",
+    ),
+    "chromium_cache.pickle_short": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Too short for a pickle header ({size} B)",
+        "chromium_cache.pickle_short",
+    ),
+    "chromium_cache.pickle_past_end": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Reading {what} ({size:,} B at offset {offset:,}) runs past the pickle's end; read up to there",
+        "chromium_cache.pickle_past_end",
+    ),
+    "chromium_cache.pickle_negative_length": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Negative length for {what} at offset {offset:,}; read up to there",
+        "chromium_cache.pickle_negative_length",
+    ),
+    "chromium_cache.pickle_size_mismatch": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The pickle's stored payload size ({payload:,} B) isn't the stream's ({size:,} B)",
+        "chromium_cache.pickle_size_mismatch",
+    ),
+    "chromium_cache.response_info_version": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Response info version {version}; Chromium reads version {supported} only",
+        "chromium_cache.response_info_version",
+    ),
+    "chromium_cache.status_line_not_http": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The stored status line doesn't start with HTTP/",
+        "chromium_cache.status_line_not_http",
+    ),
+    "chromium_cache.scts_not_decoded": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "{count} signed certificate timestamp(s) in an earlier layout that isn't decoded; the "
+        "fields after them aren't read",
+        "chromium_cache.scts_not_decoded",
+    ),
+    "chromium_cache.vary_earlier_layout": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Earlier layout: the 16-byte MD5 digest without a hash type",
+        "chromium_cache.vary_earlier_layout",
+    ),
+    "chromium_cache.body_zstd_by_cache": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The cache stored the body zstd-compressed itself (independent of Content-Encoding)",
+        "chromium_cache.body_zstd_by_cache",
+    ),
+    "chromium_cache.code_header_short": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Stream 0 ({size} B) is shorter than the Code Cache header (12 B)",
+        "chromium_cache.code_header_short",
+    ),
+    "chromium_cache.code_header_size": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Stream 0 is {size:,} B, the header's code size calls for {expected:,} B (Chromium "
+        "treats such an entry as invalid)",
+        "chromium_cache.code_header_size",
+    ),
+    "chromium_cache.sha_key_mismatch": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The key isn't the SHA-256 of the entry's data",
+        "chromium_cache.sha_key_mismatch",
+    ),
+    "chromium_cache.proto_failed": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Not decodable as {message}: {detail}",
+        "chromium_cache.proto_failed",
+    ),
+    "chromium_cache.proto_missing_required": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Required fields missing: {fields}",
+        "chromium_cache.proto_missing_required",
+    ),
+    "chromium_cache.proto_unknown_fields": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Fields the schema doesn't define: {numbers}",
+        "chromium_cache.proto_unknown_fields",
+    ),
+    "chromium_cache.cs_index_unreadable": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "index.txt in the parent folder couldn't be read: {detail}",
+        "chromium_cache.cs_index_unreadable",
+    ),
+    "chromium_cache.cs_index_not_decoded": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "index.txt in the parent folder isn't a CacheStorage index: {detail}",
+        "chromium_cache.cs_index_not_decoded",
+    ),
+    "chromium_cache.cs_index_other_dir": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "index.txt in the parent folder is a CacheStorage index but doesn't name this folder ({name})",
+        "chromium_cache.cs_index_other_dir",
+    ),
+    "chromium_cache.heuristic_reading": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Heuristic: the key shows no cache kind; stream 0 is read as {readings} because it is a "
+        "complete, valid record of that type",
+        "chromium_cache.heuristic_reading",
+    ),
+    "chromium_cache.content_kind_undetermined": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Content not decoded: the cache kind isn't determined from the key (e.g. GPU/shader "
+        "caches); streams shown as stored",
+        "chromium_cache.content_kind_undetermined",
+    ),
+    "chromium_cache.body_v8_not_decoded": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "V8 bytecode – not decoded",
+        "chromium_cache.body_v8_not_decoded",
+    ),
+    "chromium_cache.cs_body_stored_decoded": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Body as the page received it: the network stack removes the transfer encoding before "
+        "fetch() hands the response over, CacheStorage keeps the response's headers -- the "
+        "Content-Encoding header ({coding}) doesn't describe these bytes; not decompressed",
+        "chromium_cache.cs_body_stored_decoded",
+    ),
+    "chromium_cache.heuristic_body_not_decoded": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Not decompressed: the HTTP cache stores bodies as transferred, other caches holding a "
+        "response info (Service Worker scripts) store them decoded -- which kind this is isn't "
+        "known, so the Content-Encoding header ({coding}) may not describe these bytes",
+        "chromium_cache.heuristic_body_not_decoded",
+    ),
+    "chromium_cache.coding_unsupported": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Content-Encoding {coding} isn't supported; the body is shown as stored only",
+        "chromium_cache.coding_unsupported",
+    ),
+    "chromium_cache.coding_failed": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The body doesn't decode as the declared Content-Encoding {coding}: {detail}",
+        "chromium_cache.coding_failed",
+    ),
+    "chromium_cache.cache_zstd_failed": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The body the cache stored zstd-compressed doesn't decompress: {detail}",
+        "chromium_cache.cache_zstd_failed",
+    ),
+    "chromium_cache.coding_partial": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Partial: the body doesn't decode completely as the declared Content-Encoding {coding} "
+        "({detail}); the derived body holds the {size:,} B decoded before that point (input "
+        "{input:,} B)",
+        "chromium_cache.coding_partial",
+    ),
+    "chromium_cache.cache_zstd_partial": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Partial: the body the cache stored zstd-compressed doesn't decompress completely "
+        "({detail}); the derived body holds the {size:,} B decompressed before that point "
+        "(input {input:,} B)",
+        "chromium_cache.cache_zstd_partial",
+    ),
+    "chromium_cache.coding_partial_short": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Partial: the body's {input:,} B end before the end of the declared Content-Encoding "
+        "{coding} stream; the derived body holds the {size:,} B decoded from them",
+        "chromium_cache.coding_partial_short",
+    ),
+    "chromium_cache.cache_zstd_partial_short": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Partial: the body the cache stored zstd-compressed ({input:,} B) ends before the end "
+        "of its zstd frame; the derived body holds the {size:,} B decompressed from it",
+        "chromium_cache.cache_zstd_partial_short",
+    ),
+    "chromium_cache.coding_short": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The body's {input:,} B end before the declared Content-Encoding {coding} gives a "
+        "single decoded byte; no derived body",
+        "chromium_cache.coding_short",
+    ),
+    "chromium_cache.cache_zstd_short": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The body the cache stored zstd-compressed ({input:,} B) ends before a single byte "
+        "decompresses; no derived body",
+        "chromium_cache.cache_zstd_short",
+    ),
+    "chromium_cache.coding_trailing_ignored": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "{count:,} B follow the end of the {coding} stream (from offset {offset:,} of its "
+        "input): Chromium ignores them, so they aren't in the derived body; RAW holds them",
+        "chromium_cache.coding_trailing_ignored",
+    ),
+    "chromium_cache.body_truncated_flag": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The response info marks this entry TRUNCATED: the download didn't finish, the body "
+        "holds only the part received",
+        "chromium_cache.body_truncated_flag",
+    ),
+    "chromium_cache.body_unreadable": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The entry has a body that couldn't be read: {reason}",
+        "chromium_cache.body_unreadable",
+    ),
+    "chromium_cache.no_body": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "No body stored for this entry",
+        "chromium_cache.no_body",
+    ),
+    "chromium_cache.certificate_not_decoded": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Certificate not decodable: {detail}",
+        "chromium_cache.certificate_not_decoded",
+    ),
+    "chromium_cache.blockfile_version": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Blockfile version {version} isn't one Chromium writes (2.0, 2.1, 3.0); read with the 3.0 layout",
+        "chromium_cache.blockfile_version",
+    ),
+    "chromium_cache.index_table_short": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The hash table has {length:,} buckets, the file holds {available:,}; those are read",
+        "chromium_cache.index_table_short",
+    ),
+    "chromium_cache.block_file_number": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The header says block file {stored}, the file is named {name}",
+        "chromium_cache.block_file_number",
+    ),
+    "chromium_cache.block_file_not_addressed": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Block file not named data_<number>: the cache's addresses can't point into it",
+        "chromium_cache.block_file_not_addressed",
+    ),
+    "chromium_cache.addr_not_initialized": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Address not initialized",
+        "chromium_cache.addr_not_initialized",
+    ),
+    "chromium_cache.addr_invalid": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Invalid address {addr}",
+        "chromium_cache.addr_invalid",
+    ),
+    "chromium_cache.data_short": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Only {size:,} of {expected:,} B are in the file",
+        "chromium_cache.data_short",
+    ),
+    "chromium_cache.data_exceeds_blocks": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Stored size {size:,} B is larger than the address's blocks ({capacity:,} B); the blocks are shown",
+        "chromium_cache.data_exceeds_blocks",
+    ),
+    "chromium_cache.entry_self_hash": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The entry record's self hash doesn't match its bytes",
+        "chromium_cache.entry_self_hash",
+    ),
+    "chromium_cache.rankings_self_hash": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The rankings node's self hash doesn't match its bytes",
+        "chromium_cache.rankings_self_hash",
+    ),
+    "chromium_cache.key_length_invalid": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Key length {length} isn't valid; no key read",
+        "chromium_cache.key_length_invalid",
+    ),
+    "chromium_cache.key_past_blocks": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Key length {length:,} is longer than the entry's blocks hold ({span:,} B); the key is cut there",
+        "chromium_cache.key_past_blocks",
+    ),
+    "chromium_cache.key_unreadable": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The key stored outside the entry couldn't be read",
+        "chromium_cache.key_unreadable",
+    ),
+    "chromium_cache.key_hash_mismatch": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The stored key hash isn't the hash of the key",
+        "chromium_cache.key_hash_mismatch",
+    ),
+    "chromium_cache.state_invalid": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Entry state {state} isn't one Chromium defines",
+        "chromium_cache.state_invalid",
+    ),
+    "chromium_cache.entry_dirty": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Marked dirty by run {dirty} (the index's current run is {current}): the entry wasn't "
+        "closed properly and Chromium would discard it",
+        "chromium_cache.entry_dirty",
+    ),
+    "chromium_cache.chain_loop": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Hash bucket {bucket}: the entry chain loops; followed up to the repeat",
+        "chromium_cache.chain_loop",
+    ),
+    "chromium_cache.chain_bad_addr": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Hash bucket {bucket}: address {addr} doesn't point to an entry record; the chain ends there",
+        "chromium_cache.chain_bad_addr",
+    ),
+    "chromium_cache.list_loop": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "LRU list {list} loops; followed up to the repeat",
+        "chromium_cache.list_loop",
+    ),
+    "chromium_cache.list_bad_addr": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "LRU list {list}: address {addr} doesn't point to a rankings node; the list ends there",
+        "chromium_cache.list_bad_addr",
+    ),
+    "chromium_cache.carved_key_hash": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Heuristic: block {block} of {file} is free in the allocation bitmap and holds an entry "
+        "record whose stored key hash is the hash of the key read there",
+        "chromium_cache.carved_key_hash",
+    ),
+    "chromium_cache.carved_self_hash_ok": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "record self hash matches",
+        "chromium_cache.carved_self_hash_ok",
+    ),
+    "chromium_cache.carved_self_hash_bad": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "record self hash doesn't match",
+        "chromium_cache.carved_self_hash_bad",
+    ),
+    "chromium_cache.carved_rankings_back": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "its rankings node points back to it",
+        "chromium_cache.carved_rankings_back",
+    ),
+    "chromium_cache.carved_rankings_not_back": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "no rankings node points back to it (no last-used time)",
+        "chromium_cache.carved_rankings_not_back",
+    ),
+    "chromium_cache.carved_also_listed": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "the same block is also reached from the index",
+        "chromium_cache.carved_also_listed",
+    ),
+    "chromium_cache.carved_long_key": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Heuristic: block {block} of {file} is free in the allocation bitmap and holds an entry "
+        "record whose key, stored outside the record at {addr}, has the stored key hash",
+        "chromium_cache.carved_long_key",
+    ),
+    "chromium_cache.carved_long_key_unread": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Heuristic, weak: block {block} of {file} is free in the allocation bitmap and holds an "
+        "entry record whose key is stored outside it at {addr}; that key couldn't be read "
+        "({reason}), so the key hash isn't checked",
+        "chromium_cache.carved_long_key_unread",
+    ),
+    "chromium_cache.sparse_child_rejected": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Not part of the parent's data (Chromium checks a child so before reading it): {reasons}",
+        "chromium_cache.sparse_child_rejected",
+    ),
+    "chromium_cache.sparse_parent_invalid": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The parent's sparse header isn't one Chromium opens ({reasons}); no child is used for "
+        "the body, every child is listed apart",
+        "chromium_cache.sparse_parent_invalid",
+    ),
+    "chromium_cache.sparse_children_apart": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "{count:,} sparse child entr(ies) not part of the body: listed apart with why",
+        "chromium_cache.sparse_children_apart",
+    ),
+    "chromium_cache.sparse_last_block_reset": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Sparse child #{child}: its header names block {block} as partly written with length "
+        "{length}, outside 0–1,023 -- Chromium resets that to no partly written block, so that "
+        "block isn't part of the data",
+        "chromium_cache.sparse_last_block_reset",
+    ),
+    "chromium_cache.sparse_key_id": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "its key doesn't end in a signature and a child number in hex, each after a colon",
+        "chromium_cache.sparse_key_id",
+    ),
+    "chromium_cache.sparse_key_signature": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "the signature in its key ({key}) isn't the parent's ({parent}), so Chromium never looks it up",
+        "chromium_cache.sparse_key_signature",
+    ),
+    "chromium_cache.sparse_not_in_map": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "the parent's child bitmap doesn't mark child {child}",
+        "chromium_cache.sparse_not_in_map",
+    ),
+    "chromium_cache.sparse_no_child_flag": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "the entry isn't flagged CHILD_ENTRY",
+        "chromium_cache.sparse_no_child_flag",
+    ),
+    "chromium_cache.sparse_child_short": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "its stream 2 ({size:,} B) is shorter than the sparse header and block bitmap ({expected:,} B)",
+        "chromium_cache.sparse_child_short",
+    ),
+    "chromium_cache.sparse_signature": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "the signature in its sparse header ({child}) isn't the parent's ({parent})",
+        "chromium_cache.sparse_signature",
+    ),
+    "chromium_cache.sparse_magic": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "the magic in its sparse header ({magic}) isn't {expected}",
+        "chromium_cache.sparse_magic",
+    ),
+    "chromium_cache.sparse_no_data": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "its data stream couldn't be read, so its blocks aren't known",
+        "chromium_cache.sparse_no_data",
+    ),
+    "chromium_cache.sparse_parent_short": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "stream 2 ({size:,} B) is shorter than the sparse header and bitmap ({expected:,} B)",
+        "chromium_cache.sparse_parent_short",
+    ),
+    "chromium_cache.sparse_parent_has_data": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "stream 1 isn't empty",
+        "chromium_cache.sparse_parent_has_data",
+    ),
+    "chromium_cache.sparse_parent_map_size": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "the child bitmap is {size:,} B (at most 8,192 B and a multiple of 4)",
+        "chromium_cache.sparse_parent_map_size",
+    ),
+    "chromium_cache.sparse_parent_key_len": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "the header's parent key length ({stored}) isn't the key's ({actual})",
+        "chromium_cache.sparse_parent_key_len",
+    ),
+    "chromium_cache.carved_blocks_reused": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "The record's streams point to blocks that may have been reused since it was freed",
+        "chromium_cache.carved_blocks_reused",
+    ),
     # -- LevelDB ----------------------------------------------------------
     "leveldb.data_files_not_read": QT_TRANSLATE_NOOP(
         "ParseIssue",
@@ -1708,6 +2330,12 @@ MESSAGES: dict[str, str] = {
         "ParseIssue",
         "Supported for the whole LevelDB folder — select the folder, not a single file",
         "hexfallback.parser_folder",
+    ),
+    "hexfallback.parser_folder_chromium_cache": QT_TRANSLATE_NOOP(
+        "ParseIssue",
+        "Part of a Chromium Blockfile cache — open the folder holding index and data_ files, "
+        "not a single file",
+        "hexfallback.parser_folder_chromium_cache",
     ),
     "hexfallback.parser_logs": QT_TRANSLATE_NOOP(
         "ParseIssue",
