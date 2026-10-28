@@ -220,6 +220,9 @@ jobs:
 
       - name: Build (PyInstaller) macOS
         if: runner.os == 'macOS'
+        # Keep the signed bundle immutable; Qt hooks collect the needed modules.
+        env:
+          PYINSTALLER_VERIFY_BUNDLE_SIGNATURE: "1"
         run: |
           python -m PyInstaller --noconfirm --clean --windowed --name crush \
             --icon crush.icns \
@@ -261,24 +264,6 @@ jobs:
             --add-data "crush/bin/flatc/flatc-macos:crush/bin/flatc/" \
             --add-data "crush/bin/flatc/VERSION.txt:crush/bin/flatc/" \
             crush/__main__.py
-
-      - name: Strip unused Qt frameworks (macOS)
-        if: runner.os == 'macOS'
-        run: |
-          # PyInstaller 6+ bundles into _internal/; fall back to MacOS/ for older versions
-          for root in "dist/crush.app/Contents/MacOS/_internal" "dist/crush.app/Contents/MacOS"; do
-            lib="$root/PySide6/Qt/lib"
-            [ -d "$lib" ] || continue
-            for mod in \
-              QtWebEngineCore QtWebEngineWidgets QtWebEngineQuick \
-              Qt3DAnimation Qt3DCore Qt3DExtras Qt3DInput Qt3DLogic Qt3DRender \
-              QtMultimedia QtMultimediaWidgets QtBluetooth QtNfc QtSensors \
-              QtPositioning QtRemoteObjects QtSerialPort QtDataVisualization \
-              QtCharts QtQml QtQuick QtQuick3D; do
-              rm -rf "$lib/${mod}.framework"
-            done
-            find "$root" -name "QtWebEngineProcess*" -prune -exec rm -rf {} \; 2>/dev/null || true
-          done
 
       - name: Build (PyInstaller) Windows
         if: runner.os == 'Windows'
@@ -341,6 +326,7 @@ jobs:
           extract_dir="$RUNNER_TEMP/crush-smoke"
           log_file="$RUNNER_TEMP/crush-smoke.log"
           ditto -x -k "$artifact" "$extract_dir"
+          codesign --verify --all-architectures --deep --strict "$extract_dir/crush.app"
           executable="$extract_dir/crush.app/Contents/MacOS/crush"
 
           if [ "${{ matrix.os }}" = "macos-latest" ]; then
