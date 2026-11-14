@@ -42,6 +42,19 @@ each one holds is recorded in ewfprobe's `tests/fixtures/manifest.json` and
 | `virtual/windows/*.gz` | VHD, VHDX: dynamic, and differencing over it | Windows 11 diskpart | — |
 | `virtual/qemu-compact/*.gz` | VHD, VHDX, VMDK, QCOW (one LUKS-encrypted) | qemu-img 10.2.1 | — |
 
+## ASIF (`virtual/apple/`)
+
+| File | Container | Written by | Opens with |
+|---|---|---|---|
+| `asif-apfs-1g.asif.gz` | ASIF, 1 GB disk: GPT, one empty APFS container | `diskutil image create blank --format ASIF --size 1g -fs APFS`, macOS 26 | — |
+
+Made for Crush, not copied from ewfprobe; gzip-compressed (`gzip -9 -n`). Its 954
+chunks are stored whole (2), stored in part through the block bitmap (3) and
+recorded as zeros (949), and its two directories have versions 1 and 2, so one
+file exercises every path of the reader. Apple publishes no ASIF reader to take
+the disk's hash from: the expected SHA-256 is the one ewfprobe and
+dissect.hypervisor (fox-it, asif.py) both read.
+
 `dmg-sparsebundle.sparsebundle/bands/*.gz` are gzip-compressed here; the tests
 decompress them into a copy of the bundle.
 

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 """The containers Open Disk Image… reads through ewfprobe 0.12 beside EWF and
-AFF: AFF4, Apple disk images, VHD/VHDX, VMDK and QCOW virtual disks, and the
+AFF: AFF4, Apple disk images, VHD/VHDX, VMDK, QCOW and ASIF virtual disks, and the
 encrypted containers that open with a password or a private key.
 
 Every fixture was written by the tool named in fixtures/acquisition/README.md
@@ -48,6 +48,12 @@ _QEMU_VHD = ("35a9e0259822cd934990ad1e371e1fa0e4c2e5d2fa0de831d84a1c49044cb429",
 _QEMU_DISK = ("eda5100326096c7e523e664a6e8283d1559d5b9e46d63c688c6c5b9f1b690329", 16_777_216)
 _QEMU_DELTA = ("760ff6531c146c65a91bd48e08f82d59e23c6002340282eb449b6bf5c66947fe", 16_777_216)
 _QEMU_OVERLAY = ("5794a0fb70a7483949cb8f5e8166ce5ef202dffcdab29abae3b88027ef2bf5b6", 16_777_216)
+# The 1 GB disk of asif-apfs-1g.asif (diskutil image create blank --format ASIF
+# --size 1g -fs APFS, macOS 26): GPT, one APFS container. Apple publishes no
+# reader to take it from, so this is the hash two readers written apart agree
+# on: ewfprobe's and dissect.hypervisor's (fox-it, asif.py), each over the
+# whole disk.
+_ASIF_DISK = ("abbb08ba09782b73ad76045c5c3b1a31800af653f2b74f5d4ffb0b8d9b84d25f", 1_000_000_000)
 # MD5 of the stream pyaff4 was given (ewfprobe tests/test_aff4.py, KNOWN).
 _AFF4_STREAM_MD5 = "8dd04764855150cb5ac7f36dd584571d"
 
@@ -680,6 +686,79 @@ class TestQcow:
     def test_source_unmodified(self, tmp_path: Path) -> None:
         path = _place(tmp_path, _QEMU + "qcow2-overlay.qcow2.gz", _QEMU + "qcow2-base.qcow2.gz")
         _assert_unmodified(sorted(tmp_path.iterdir()), path)
+
+
+# ---------------------------------------------------------------------------
+# ASIF
+# ---------------------------------------------------------------------------
+
+_ASIF = "virtual/apple/asif-apfs-1g.asif.gz"
+
+
+class TestAsif:
+    @pytest.mark.forensic(
+        category="Known-output Verification",
+        subject="ASIF virtual disk",
+        desc="asif-apfs-1g.asif, written by diskutil (macOS 26), must read back to the "
+             "SHA-256 two independently written ASIF readers agree on, with chunks stored "
+             "whole, stored in part (block bitmap) and recorded as zeros",
+    )
+    def test_disk_matches(self, tmp_path: Path) -> None:
+        note = _assert_disk(_place(tmp_path, _ASIF), "ASIF", _ASIF_DISK)
+        assert "ASIF virtual disk" in note
+
+    def test_is_recognised_by_content_under_a_virtual_machine_img_name(
+        self, tmp_path: Path
+    ) -> None:
+        """The Virtualization framework (UTM, Tart) keeps a macOS guest's disk
+        as an ASIF named <uuid>.img: it is read as the container, not as a raw
+        image without a partition table."""
+        src = _place(tmp_path, _ASIF)
+        img = src.rename(tmp_path / "E330F393-982D-4C93-96BD-811F437E0619.img")
+        vfs = open_vfs(img, as_disk_image=True)
+        try:
+            assert isinstance(vfs, RawImageVFS), getattr(vfs, "fallback_note", "")
+            assert vfs.acquisition() == "ASIF"
+            kinds = [vol.get("kind") for vol in vfs._handle.volumes]
+            assert "apfs" in kinds
+            assert _find(vfs.root(), ["p1_lba40", "untitled"]) is not None
+        finally:
+            vfs.close()
+
+    def test_metadata_and_chunk_states_are_reported(self, tmp_path: Path) -> None:
+        from crush.third_party.ewfprobe import ewfprobe
+
+        with ewfprobe.open_ewf(str(_place(tmp_path, _ASIF))) as image:
+            info = image.asif
+        assert info["guid"] == "90b91721-1853-4a81-b4ea-8482858b0073"
+        assert info["stable_uuid"] == "aae8ec59-aea0-424c-8351-8c2b5b9288cb"
+        assert info["chunk_size"] == 1 << 20 and info["block_size"] == 512
+        assert info["directory_version"] == 2 and info["directory_versions"] == [1, 2]
+        assert info["chunk_states"] == {"stored": 2, "zeros": 949, "stored in part": 3}
+        assert info["metadata_error"] is None
+
+    def test_cut_short_is_refused_with_the_reason(self, tmp_path: Path) -> None:
+        """A copy that ends before a chunk the tables place in it is refused,
+        never read with the missing bytes as zeros."""
+        path = _place(tmp_path, _ASIF)
+        with path.open("r+b") as fh:
+            fh.truncate(13 << 20)            # chunk 13 holds the end of the disk
+        vfs = open_vfs(path, as_disk_image=True)
+        try:
+            assert isinstance(vfs, FileVFS)
+            assert "cut short" in str(vfs.fallback_note)
+        finally:
+            vfs.close()
+
+    @pytest.mark.forensic(
+        category="Source Immutability",
+        subject="ASIF virtual disk",
+        desc="Reading the whole disk of asif-apfs-1g.asif and verifying it must leave the "
+             "file byte-identical, with an unchanged mtime",
+    )
+    def test_source_unmodified(self, tmp_path: Path) -> None:
+        path = _place(tmp_path, _ASIF)
+        _assert_unmodified([path], path)
 
 
 # ---------------------------------------------------------------------------

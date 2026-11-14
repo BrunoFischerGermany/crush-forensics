@@ -1,4 +1,6 @@
-# Vendored, byte-for-byte and UNMODIFIED, from:
+# Vendored from the commit below, WITH ONE LOCAL CHANGE: ASIF (Apple sparse
+# image format) support, offered upstream to abrignoni/qnxprobe. Once upstream has it,
+# re-vendor at that commit and drop this note. Otherwise unmodified, from:
 #   https://github.com/abrignoni/qnxprobe
 #   commit c8099eea0b5d0f30bf6899bd66242680514ba0ab (2026-10-23, tag v1.75)
 #   qnxprobe.py, MIT License (see LICENSE in this directory)
@@ -186,13 +188,16 @@ AD1_SIGNATURE  = b"ADSEGMENTEDFILE\x00"        # FTK Imager logical evidence, ev
 # bytes in images older than Virtual PC 2004), and a dynamic or differencing one also
 # begins with a copy of it; a VHDX begins "vhdxfile"; a VMDK is a text descriptor
 # beginning "# Disk DescriptorFile" or a sparse extent beginning "KDMV" (ESXi's
-# "COWD"); a QCOW begins "QFI\xfb" and its version, 1, 2 or 3.
+# "COWD"); a QCOW begins "QFI\xfb" and its version, 1, 2 or 3; an ASIF (Apple's sparse
+# image format, macOS 26, the disk of a macOS guest of the Virtualization framework)
+# begins "shdw" and its version, 1.
 VHD_COOKIE = b"conectix"
 VHDX_SIGNATURE = b"vhdxfile"
 VMDK_DESCRIPTOR_START = b"# Disk DescriptorFile"
 VMDK_SPARSE_MAGIC = b"KDMV"
 VMDK_COWD_MAGIC = b"COWD"
 QCOW_MAGIC = b"QFI\xfb"
+ASIF_MAGIC = b"shdw"
 # Apple disk images. A UDIF image (.dmg) ends in a 512-byte trailer beginning
 # "koly"; an uncompressed read-write image has none and is plain disk bytes, read
 # as raw. A .dmgpart segment of a split .dmg ends in one too, and the reader names
@@ -227,6 +232,7 @@ _ACQUISITION_NAMES = {
     "VHDX": "a Microsoft virtual hard disk (.vhdx)",
     "VMDK": "a VMware virtual disk (.vmdk)",
     "QCOW": "a QEMU virtual disk (.qcow or .qcow2)",
+    "ASIF": "an Apple sparse image format disk (.asif, or a .img of a macOS virtual machine)",
 }
 
 
@@ -256,7 +262,7 @@ def _is_aff4(path):
 
 
 def _virtual_disk_kind(path):
-    """ewfprobe's answer when it is here ("VHD", "VHDX", "VMDK", "QCOW" or None);
+    """ewfprobe's answer when it is here ("VHD", "VHDX", "VMDK", "QCOW", "ASIF" or None);
     without it, the same bytes it reads (the first 512 and the last 512), so a
     virtual disk is still refused as one rather than read as its container's bytes."""
     if ewfprobe is not None and hasattr(ewfprobe, "virtual_disk_kind"):
@@ -279,6 +285,8 @@ def _virtual_disk_kind(path):
         return "VMDK"
     if head[:4] == QCOW_MAGIC and head[4:8] in (b"\0\0\0\1", b"\0\0\0\2", b"\0\0\0\3"):
         return "QCOW"
+    if head[:4] == ASIF_MAGIC and head[4:8] == b"\0\0\0\1":
+        return "ASIF"
     if VHD_COOKIE in (tail[:8], tail[1:9], head[:8]):
         return "VHD"
     return None
@@ -409,7 +417,7 @@ def needs_private_key(path):
 def acquisition_format(path):
     """What acquisition container path is: "EWF", "EWF2", "AFF", "AFD", "AFF4",
     "UDIF", "SPARSEIMAGE", "SPARSEBUNDLE", "L01", "Lx01", "AD1", "DMG_ENCRYPTED",
-    "AD_ENCRYPTED", or a virtual machine disk, "VHD", "VHDX", "VMDK" or "QCOW", or
+    "AD_ENCRYPTED", or a virtual machine disk, "VHD", "VHDX", "VMDK", "QCOW" or "ASIF", or
     None for anything else, which is read as a raw image. An
     AFF4 is a ZIP, and is told from any other ZIP by the volume URI the AFF4
     Standard (5.4) has its writer put in the ZIP comment or in a first member
@@ -919,6 +927,7 @@ _ACQUISITION_LABELS = {
     "VHDX": "a VHDX virtual disk",
     "VMDK": "a VMDK virtual disk",
     "QCOW": "a QCOW virtual disk",
+    "ASIF": "an ASIF virtual disk",
 }
 
 
@@ -939,7 +948,7 @@ def describe_acquisition(image):
                 f"file{'' if stored == 1 else 's'}, read by the reader{locked}")
     label = _ACQUISITION_LABELS.get(fmt, "an acquisition")
     unit = ("files" if fmt in ("AFF", "AFD", "AFM", "AFF4", "UDIF", "SPARSEIMAGE",
-                               "UDRW", "VHD", "VHDX", "VMDK", "QCOW")
+                               "UDRW", "VHD", "VHDX", "VMDK", "QCOW", "ASIF")
             else "segments")
     # a differencing disk, delta or overlay is read through the disks under it
     parents = [os.path.basename((getattr(q, "paths", None) or ["?"])[0])
@@ -22134,7 +22143,7 @@ def _sibling_kind(fh, size, name):
     if (head[:8] in (EWF_SIGNATURE, EWF2_SIGNATURE, AFF_SIGNATURE, L01_SIGNATURE, LX01_SIGNATURE,
                      AD1_SIGNATURE[:8], DMG_ENCRYPTED_SIGNATURE, ADCRYPT_SIGNATURE, VHDX_SIGNATURE)
             or head[:4] in (b"AFF\x00", SPARSEIMAGE_SIGNATURE, ZIP_SIGNATURE, VMDK_SPARSE_MAGIC,
-                            VMDK_COWD_MAGIC, QCOW_MAGIC)
+                            VMDK_COWD_MAGIC, QCOW_MAGIC, ASIF_MAGIC)
             or text[:len(VMDK_DESCRIPTOR_START)].lower() == VMDK_DESCRIPTOR_START.lower()
             or VHD_COOKIE in (tail[:8], tail[1:9], head[:8])
             or tail[:4] == UDIF_TRAILER):

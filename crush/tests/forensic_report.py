@@ -96,6 +96,7 @@ SUBJECT_GROUPS: dict[str, tuple[str, ...]] = {
         "VHD/VHDX virtual disk",
         "VMDK virtual disk",
         "QCOW virtual disk",
+        "ASIF virtual disk",
     ),
     "Disk image filesystems": (
         "NTFS",

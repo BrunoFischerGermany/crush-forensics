@@ -2242,7 +2242,7 @@ class SevenZipVFS(VFS):
 class RawImageVFS(VFS):
     """VFS backed by a raw disk image (.img/.dd/split .001 set), a forensic
     acquisition (EWF .E01 + segments, SMART, Ex01, AFF/AFD, AFF4), an Apple
-    disk image or a virtual machine disk (VHD, VHDX, VMDK, QCOW), read in
+    disk image or a virtual machine disk (VHD, VHDX, VMDK, QCOW, ASIF), read in
     place via the vendored qnxprobe (+ ewfprobe) readers — no mounting, no
     admin rights, and only the files an examiner actually opens leave the
     image. *password* / *private_key* (a key file's path) open an encrypted
@@ -3250,7 +3250,7 @@ def _tar_suffix(p: Path) -> str:
 # counts too.
 DISK_IMAGE_SUFFIXES = (
     ".img", ".dd", ".raw", ".e01", ".s01", ".ex01", ".aff", ".aff4",
-    ".dmg", ".dmgpart", ".sparseimage", ".vhd", ".vhdx", ".vmdk", ".qcow", ".qcow2",
+    ".dmg", ".dmgpart", ".sparseimage", ".vhd", ".vhdx", ".vmdk", ".qcow", ".qcow2", ".asif",
     ".nand", ".ubi", ".ubifs", ".squashfs", ".sqsh", ".jffs2", ".yaffs2",
 )
 

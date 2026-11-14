@@ -114,6 +114,7 @@ CONTAINER_HEAD_SIGNATURES: tuple[bytes, ...] = (
     qnxprobe.VMDK_COWD_MAGIC,
     qnxprobe.VMDK_DESCRIPTOR_START,
     qnxprobe.QCOW_MAGIC,
+    qnxprobe.ASIF_MAGIC,
 )
 # FTK Imager's AD encryption: what it holds (a disk image or an AD1) shows
 # only once its password or key opened it.
@@ -147,6 +148,7 @@ _CONTAINER_LABELS = {
     "VHDX": "VHDX",
     "VMDK": "VMDK",
     "QCOW": "QCOW",
+    "ASIF": "Apple sparse image format (ASIF)",
 }
 
 
@@ -204,7 +206,7 @@ class RawImageHandle:
     # ewfprobe's name for the container ("EWF-E01", "EWF-S01", "EWF2-Ex01",
     # "AFF", "AFD", "AFM", and since ewfprobe 0.12 "AFF4", "UDIF",
     # "SPARSEIMAGE", "UDRW" (an encrypted read-write Apple disk image), "RAW"
-    # (an AD-encrypted raw set), "VHD", "VHDX", "VMDK", "QCOW"), None for a
+    # (an AD-encrypted raw set), "VHD", "VHDX", "VMDK", "QCOW", "ASIF"), None for a
     # raw image or split set.
     acquisition: str | None = None
     # The reader's description of the container: the files it is read from
@@ -214,7 +216,7 @@ class RawImageHandle:
 
     @property
     def padded_chunks(self) -> list[dict[str, Any]]:
-        """The chunks (E01, SMART, Ex01), grains (VMDK) or clusters (QCOW) read
+        """The chunks (E01, SMART, Ex01, ASIF), grains (VMDK) or clusters (QCOW) read
         so far whose stored data ran out before the bytes they cover, which
         ewfprobe (0.14.0) reads with zeros in place of the rest. Only the units
         read are known; verify_acquisition() reads them all."""
@@ -290,7 +292,7 @@ def open_raw_image(
     """Open `path` as a raw disk image, a forensic acquisition (EWF .E01,
     SMART .s01, EWF2 .Ex01, AFF/AFD, AFF4), an Apple disk image (.dmg,
     .sparseimage, or a .sparsebundle folder) or a virtual disk (VHD, VHDX,
-    VMDK, QCOW), and list its
+    VMDK, QCOW, ASIF), and list its
     volumes. *password* opens an encrypted container (an encrypted Apple disk
     image, an AD-encrypted set, an encrypted AFF); *private_key* is the path
     of the key file that opens one sealed to a certificate. *secrets* are

@@ -59,6 +59,7 @@ VFS_SUBJECTS: dict[str, tuple[str, ...]] = {
         "Apple disk image (.dmg/.sparseimage/.sparsebundle)", "VHD/VHDX virtual disk",
         "VMDK virtual disk",
         "QCOW virtual disk",
+        "ASIF virtual disk",
     ),
 }
 # VFS classes that aren't a source of evidence, and why.

@@ -18,7 +18,7 @@ In the tables, a number is how many checks exist; **not tested** means there is 
 
 ## Overview
 
-303 checks in total.
+305 checks in total.
 
 ### Sources
 
@@ -47,6 +47,7 @@ In the tables, a number is how many checks exist; **not tested** means there is 
 | [VHD/VHDX virtual disk](#vhdvhdx-virtual-disk) | 1 | not tested | not tested | 4 | not tested | not tested |
 | [VMDK virtual disk](#vmdk-virtual-disk) | 1 | not tested | not tested | 2 | not tested | not tested |
 | [QCOW virtual disk](#qcow-virtual-disk) | 1 | not tested | not tested | 2 | not tested | not tested |
+| [ASIF virtual disk](#asif-virtual-disk) | 1 | not tested | not tested | 1 | not tested | not tested |
 
 ### Disk image filesystems
 
@@ -316,6 +317,12 @@ No forensic checks.
 - **Source Immutability** — Reading the whole disk of qcow2-overlay.qcow2 and verifying it must leave the overlay and its backing file byte-identical, with unchanged mtimes ([test_raw_image_containers.py](../../crush/tests/test_raw_image_containers.py), `test_source_unmodified`)
 - **Known-output Verification** — qcow2-v3.qcow2 and qcow1.qcow, written by qemu-img, must read back to the SHA-256 of the disk qemu-img was given ([test_raw_image_containers.py](../../crush/tests/test_raw_image_containers.py), `test_disk_matches`)
 - **Known-output Verification** — The overlay qcow2-overlay.qcow2 (qemu-img) must be read over its backing file, name it, and read back to the SHA-256 qemu-img's disk had after the overlay's writes ([test_raw_image_containers.py](../../crush/tests/test_raw_image_containers.py), `test_overlay_is_read_over_its_backing_file_and_says_so`)
+- *Not tested:* No Side Effects, Read-only Media, Completeness, Reproducibility
+
+#### ASIF virtual disk
+
+- **Source Immutability** — Reading the whole disk of asif-apfs-1g.asif and verifying it must leave the file byte-identical, with an unchanged mtime ([test_raw_image_containers.py](../../crush/tests/test_raw_image_containers.py), `test_source_unmodified`)
+- **Known-output Verification** — asif-apfs-1g.asif, written by diskutil (macOS 26), must read back to the SHA-256 two independently written ASIF readers agree on, with chunks stored whole, stored in part (block bitmap) and recorded as zeros ([test_raw_image_containers.py](../../crush/tests/test_raw_image_containers.py), `test_disk_matches`)
 - *Not tested:* No Side Effects, Read-only Media, Completeness, Reproducibility
 
 ### Disk image filesystems

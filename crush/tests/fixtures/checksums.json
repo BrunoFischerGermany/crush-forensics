@@ -40,7 +40,7 @@
   "raw_ntfs_windows_README.md": "0c87476ef1aac795db625f5ca9e87a0720c2358aad647720d3c18c12f546d204",
   "raw_bitlocker_locked.img.gz": "39b26087b351a23b120136460b91156552e1d884d62a8de2ee0595a87a1a5714",
   "raw_bitlocker_locked.BEK": "6dbdbb9a4de9cedd30862bc62f9d601bb1a52d1a24ffeddd47ba9b140e2dae52",
-  "acquisition/README.md": "2162ecfb0c2bc1632fc4940f8a22a2fc582c22586a3b219f4493562185886b42",
+  "acquisition/README.md": "7578052daa4f3cf0f03c3b8259daceca8b45784dda4782c3996b2ff0b041877f",
   "acquisition/ex01-fast.Ex01": "39c49aa6223c96188c716864ce22256ba714b77640788c35c2a232e7e309705e",
   "acquisition/smart-fast.s01": "7434e35ee799c809aa7df67ba45ad6ea76a30006a85750283cebade956468ba6",
   "acquisition/aff-zlib.aff": "75fb91d9630172fdccb743b7e6d68e5b795286e3f0d0f9640e5be6783de19e22",
@@ -149,5 +149,6 @@
   "flatbuffers_record_sizeprefixed.bin": "0e3447167e0c6484285eab5a1a5e1e983b513bb78d186dd731a60f3be7eaaec2",
   "flatbuffers_record_vector64.bin": "36ba48d626e3a7785dff16126017fde40f72456809d4dbdc9a9ac57025401d4a",
   "flatbuffers_record.expected.json": "9dbb26f22e8641c7444e485d3d23eb9af9553e5893e99c48f48c676e6634d742",
-  "generate_flatbuffers_fixtures.py": "c60a06b89902145bf23339967057ce9a6f663ddb6f040344f2022a59fc33d156"
+  "generate_flatbuffers_fixtures.py": "c60a06b89902145bf23339967057ce9a6f663ddb6f040344f2022a59fc33d156",
+  "acquisition/virtual/apple/asif-apfs-1g.asif.gz": "171b8388980662ae35e38b1a1065e29130a0f5a718094c9a2ebee28ad8390d18"
 }

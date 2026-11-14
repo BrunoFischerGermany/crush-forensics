@@ -1,4 +1,6 @@
-# Vendored, byte-for-byte and UNMODIFIED, from:
+# Vendored from the commit below, WITH ONE LOCAL CHANGE: ASIF (Apple sparse
+# image format) support, offered upstream to abrignoni/ewfprobe. Once upstream has it,
+# re-vendor at that commit and drop this note. Otherwise unmodified, from:
 #   https://github.com/abrignoni/ewfprobe
 #   commit 4af1a54a223edbce12693b29fb3838b63a26b4f2 (2026-10-23, tag v0.15.0)
 #   ewfprobe.py, MIT License (see LICENSE in this directory)
@@ -28,7 +30,8 @@ FTK Imager encrypted with AD encryption. From an L01, EnCase's logical evidence,
 an AD1, FTK Imager's (AD-encrypted or not), it lists the files collected and reads
 each one's content. It also reads the disks virtual machines keep: VHD and VHDX,
 VMDK and QCOW (versions 1 to 3), including a differencing disk, delta or overlay
-read through its parent.
+read through its parent, and ASIF, the sparse image format of macOS 26 that Apple's
+Virtualization framework (and so UTM) keeps a macOS guest's disk in.
 
     with ewfprobe.open_ewf("evidence.E01") as img:
         img.seek(0)
@@ -70,6 +73,9 @@ is copied. The virtual disk readers follow Microsoft's "Virtual Hard Disk Image 
 Specification" (2006) and [MS-VHDX], VMware's "Virtual Disk Format 5.0" technical note,
 and QEMU's docs/interop/qcow2.rst and block/qcow.c, with what they leave open measured on
 disks Windows, VMware's tools and qemu-img wrote; no code from any of them is copied.
+ASIF, which Apple does not document, follows the layout Erik Schamper published
+("Dissecting Apple's Sparse Image Format (ASIF)", schamper.dev), with the chunk entry
+states and the block bitmap measured on images diskutil wrote; no code is copied.
 
 Scope. This reads EWF-E01, the format EnCase 6 and 7 and FTK Imager write and
 by far the most common one in the field, EWF-S01, the variant ASR Data's SMART
@@ -77,7 +83,7 @@ writes, EWF2-Ex01, which EnCase 7 and later write, AFF, including AFD and AFM, a
 EWF-L01 logical evidence, FTK Imager's AD1 (version 4), and UDIF, sparse image and
 sparse bundle Apple disk images, encrypted with a password or not, AD-encrypted E01,
 SMART, raw and AD1 sets, AFF4 containers, standard and pre-standard, striped or
-not, and VHD, VHDX, VMDK and QCOW virtual disks. It does not read Lx01 logical evidence, encrypted AFF4 or AFF4-L, an AD1 other
+not, and VHD, VHDX, VMDK, QCOW and ASIF virtual disks. It does not read Lx01 logical evidence, encrypted AFF4 or AFF4-L, an AD1 other
 than version 4, an Apple disk
 image unlocked by a keybag rather than a password or a certificate, or one in the
 older version 1 encrypted format (cdsaencr), an encrypted QCOW, a VMDK SESPARSE
@@ -161,6 +167,7 @@ FORMAT_VHD = "VHD"
 FORMAT_VHDX = "VHDX"
 FORMAT_VMDK = "VMDK"
 FORMAT_QCOW = "QCOW"
+FORMAT_ASIF = "ASIF"
 
 # EWF2 (Ex01). A 32-byte file header, then sections whose 64-byte descriptor sits
 # AFTER the section's data and points back at the previous descriptor, so a
@@ -575,7 +582,7 @@ def is_image(path) -> bool:
     directory holding AFF files,
     an Apple UDIF (.dmg), sparse image (.sparseimage) or sparse bundle
     (.sparsebundle), or a virtual disk virtual_disk_kind names (VHD, VHDX, VMDK,
-    QCOW). An L01 holds files rather than a disk; is_logical_evidence answers for it. An
+    QCOW, ASIF). An L01 holds files rather than a disk; is_logical_evidence answers for it. An
     encrypted Apple disk image is not counted, because it opens only with its
     password; apple_image_kind reports it as ENCRYPTED."""
     if os.path.isdir(path):
@@ -3696,9 +3703,9 @@ def _vhd_footer(data):
 def virtual_disk_kind(path):
     """The virtual disk format of ``path``, judged from its own bytes: "VHDX" when the
     file begins with "vhdxfile"; "VMDK" for a VMDK descriptor file or a sparse extent
-    ("KDMV" or "COWD"); "QCOW" for QEMU's qcow of version 1, 2 or 3; "VHD" when it
-    ends in a VHD footer's cookie ("conectix") or begins with a copy of one;
-    otherwise None."""
+    ("KDMV" or "COWD"); "QCOW" for QEMU's qcow of version 1, 2 or 3; "ASIF" for an
+    Apple sparse image format file ("shdw", version 1); "VHD" when it ends in a VHD
+    footer's cookie ("conectix") or begins with a copy of one; otherwise None."""
     if os.path.isdir(path):
         return None
     try:
@@ -3715,6 +3722,8 @@ def virtual_disk_kind(path):
         return FORMAT_VMDK
     if head[:4] == QCOW_MAGIC and head[4:8] in (b"\0\0\0\1", b"\0\0\0\2", b"\0\0\0\3"):
         return FORMAT_QCOW
+    if head[:4] == ASIF_MAGIC and head[4:8] == b"\0\0\0\1":
+        return FORMAT_ASIF
     # The cookie alone names a VHD, so one whose footer fails its checksum is refused
     # as a damaged VHD rather than read as something else.
     if VHD_COOKIE in (tail[:8], tail[1:9], head[:8]):
@@ -3803,6 +3812,30 @@ _QCOW_OFFSET = ((1 << 56) - 1) & ~0x1FF        # bits 9 to 55
 _QCOW_BACKING_FORMAT = 0xE2792ACA
 _QCOW_EXTERNAL_DATA = 0x44415441
 _QCOW_KNOWN_INCOMPATIBLE = 0x1F
+
+# ASIF, Apple's sparse image format (macOS 26 and later; diskutil image create
+# --format ASIF, and the disk of a macOS guest of the Virtualization framework). Apple
+# publishes no description of it; this follows Erik Schamper's ("Dissecting Apple's
+# Sparse Image Format (ASIF)", schamper.dev), with what it leaves open measured on
+# images diskutil wrote. Big-endian. An 80-byte header (in a 512-byte one) names two
+# directories, of which the one with the greater version is current, so that the
+# writer can replace either whole. A directory is that version and then one entry per
+# table: the number of the chunk (chunk_size bytes each, counted from the start of the
+# file) that holds the table, or 0 for none. A table maps one stretch of the disk in
+# groups: chunks_per_group chunk entries, then the entry of the chunk holding that
+# group's block bitmap. A chunk entry carries the chunk's number in bits 0 to 54 and
+# its state in bits 62 and 63: 1 stored whole, 3 stored where the bitmap says, 2 reads
+# as zeros, 0 not written. The bitmap gives each block two bits, the lowest first: 1
+# stored, 2 zeros, 0 past the disk. The disk is followed, out to the header's
+# maximum size, by a reserved area whose last chunk holds a "meta" header and a plist
+# (the image's "stable uuid" and user metadata).
+ASIF_MAGIC = b"shdw"
+_ASIF_HEADER = struct.Struct(">4sIIIQQ16sQQIHHQ")
+_ASIF_META_HEADER = struct.Struct(">4sIIQQ")
+_ASIF_CHUNK_NUMBER = (1 << 55) - 1
+_ASIF_STORED, _ASIF_ZEROS, _ASIF_PARTIAL = 1, 2, 3
+_ASIF_STATE_NAMES = {0: "not written", 1: "stored", 2: "zeros", 3: "stored in part"}
+_ASIF_MAX_METADATA = 1 << 20
 
 
 def _zstd_decompressor():
@@ -4011,6 +4044,7 @@ class EwfImage:
         self.vmdk = None
         self._vmdk_extents: list[dict] = []
         self.qcow = None
+        self.asif = None
         # AD1: what the image records about itself, and how its logical space maps
         # onto its files.
         self.ad1 = None
@@ -4081,6 +4115,9 @@ class EwfImage:
             return
         if virtual_disk_kind(self.paths[0]) == FORMAT_QCOW:
             self._index_qcow()
+            return
+        if virtual_disk_kind(self.paths[0]) == FORMAT_ASIF:
+            self._index_asif()
             return
         if magic == ADCRYPT_SIGNATURE:
             magic = self._unlock_adcrypt()
@@ -6251,6 +6288,242 @@ class EwfImage:
     def _qcow_absent(self, at, take):
         return self._parent_read(at, take) if self.parent is not None else bytes(take)
 
+    def _index_asif(self):
+        """Read an ASIF header, its current directory and the tables covering the
+        disk, and its metadata plist."""
+        path = self.paths[0]
+        name = os.path.basename(path)
+        size = os.path.getsize(path)
+        fh = self._handle(0)
+        fh.seek(0)
+        head = fh.read(_ASIF_HEADER.size)
+        if len(head) < _ASIF_HEADER.size:
+            raise EwfIncompleteSetError(f"{name} ends inside its ASIF header; the file is "
+                                        f"cut short")
+        (_magic, version, header_size, flags, dir_a, dir_b, guid, sectors, max_sectors,
+         chunk, block, segments, meta_chunk) = _ASIF_HEADER.unpack(head)
+        if version != 1:
+            raise EwfFormatError(f"{name} is ASIF version {version}; version 1 is read")
+        if block < 512 or block & (block - 1):
+            raise EwfFormatError(f"{name} records a block size of {block}, not a power of "
+                                 f"two of at least 512")
+        if chunk < block or chunk % block or chunk & (chunk - 1) or chunk > 1 << 30:
+            raise EwfFormatError(f"{name} records a chunk size of {chunk:,} bytes, not a "
+                                 f"power of two of at least its {block}-byte block")
+        disk, most = sectors * block, max_sectors * block
+        if not sectors or disk > most:
+            raise EwfFormatError(f"{name} records a disk of {disk:,} bytes, which its "
+                                 f"maximum of {most:,} does not hold")
+        # The table geometry follows from the chunk and block size alone: a group is as
+        # many chunks as one bitmap chunk (four blocks a byte) covers, followed by the
+        # entry of that bitmap chunk, and a table is as many whole groups as one chunk
+        # of 64-bit entries holds.
+        blocks_per_chunk = chunk // block
+        per_group = max(1, 4 * chunk // blocks_per_chunk)
+        words = chunk // 8
+        groups = words // (per_group + 1)
+        if not groups:
+            raise EwfFormatError(f"{name}'s {chunk:,}-byte chunks hold no whole group of "
+                                 f"table entries")
+        span = groups * per_group * chunk                 # disk bytes one table maps
+        tables = -(-most // span)
+        directories = []
+        for at in (dir_a, dir_b):
+            if not at:
+                continue
+            if at < header_size or at + 8 * (tables + 1) > size:
+                raise EwfIncompleteSetError(
+                    f"{name}'s directory at {at:,} lies past the end of the file; the "
+                    f"file is cut short")
+            fh.seek(at)
+            directories.append((struct.unpack(">Q", fh.read(8))[0], at))
+        if not directories:
+            raise EwfFormatError(f"{name} records no directory")
+        current_version, current_at = max(directories)
+        fh.seek(current_at + 8)
+        directory = list(struct.unpack(f">{tables}Q", _read_exactly(fh, 8 * tables)))
+        for i, entry in enumerate(directory):
+            if entry and (entry + 1) * chunk > size:
+                raise EwfIncompleteSetError(f"{name}'s table {i:,} lies past the end of "
+                                            f"the file; the file is cut short")
+        self._asif_geometry = {"chunk": chunk, "block": block, "per_group": per_group,
+                               "span": span, "blocks_per_chunk": blocks_per_chunk,
+                               "table_words": groups * (per_group + 1), "size": size}
+        self._asif_directory = directory
+        self._asif_tables = OrderedDict()
+        self._asif_bitmaps = OrderedDict()
+        # Every chunk of the disk, by its state; a stored chunk past the end of the
+        # file is refused here rather than read short later.
+        states = {}
+        disk_chunks = -(-disk // chunk)
+        for t in range(-(-disk // span)):
+            table = self._asif_table(t)
+            first = t * groups * per_group
+            for rel in range(min(groups * per_group, disk_chunks - first)):
+                state, number = (0, 0) if table is None else self._asif_entry(table, rel)
+                states[state] = states.get(state, 0) + 1
+                if state in (_ASIF_STORED, _ASIF_PARTIAL):
+                    if not number:
+                        raise EwfFormatError(f"{name} places chunk {first + rel:,} of the "
+                                             f"disk in its header chunk")
+                    if (number + 1) * chunk > size:
+                        raise EwfIncompleteSetError(f"{name} ends inside chunk "
+                                                    f"{first + rel:,} of the disk; the "
+                                                    f"file is cut short")
+        self.asif = {"version": version, "flags": flags, "guid": str(uuid.UUID(bytes=guid)),
+                     "disk_size": disk, "maximum_size": most, "chunk_size": chunk,
+                     "block_size": block, "segments": segments,
+                     "directory_version": current_version,
+                     "directory_versions": sorted(v for v, _at in directories),
+                     "chunks": disk_chunks,
+                     "chunk_states": {_ASIF_STATE_NAMES[k]: v for k, v in sorted(states.items())},
+                     "stable_uuid": None, "user_metadata": None, "metadata_error": None}
+        if meta_chunk:
+            self._asif_read_metadata(meta_chunk * chunk)
+        self.compression_level = "none"
+        self.chunk_size = _VIRTUAL_CHUNK
+        self._apple_finish(-(-disk // 512), FORMAT_ASIF, sizes=[size])
+        self.media_size = self.size = disk
+        if block != 512:
+            self.sector_size = block
+            self.sector_count = disk // block
+            self.sectors_per_chunk = self.chunk_size // block
+        self.chunk_count = self._indexed_chunks = self._needed_chunks()
+
+    def _asif_read_metadata(self, at):
+        """The image's metadata, from the "meta" chunk in the reserved area past the
+        disk. A plist that does not read is noted, not refused: the disk is read
+        without it."""
+        try:
+            head = self._asif_read(at, _ASIF_META_HEADER.size)
+            magic, _version, header_size, data_size, _rest = _ASIF_META_HEADER.unpack(head)
+            if magic != b"meta":
+                raise EwfFormatError(f"the metadata chunk begins {magic!r}, not 'meta'")
+            raw = self._asif_read(at + header_size, min(data_size, _ASIF_MAX_METADATA))
+            meta = plistlib.loads(raw.rstrip(b"\0"))
+            internal = meta.get("internal metadata") or {}
+            self.asif["stable_uuid"] = internal.get("stable uuid")
+            self.asif["user_metadata"] = dict(meta.get("user metadata") or {})
+        except Exception as exc:                # pylint: disable=broad-except
+            self.asif["metadata_error"] = str(exc)
+
+    def _asif_table(self, t):
+        """Table ``t`` of the current directory as a tuple of its entries, or None
+        when the directory has none there (that stretch of the disk was never
+        written)."""
+        if t >= len(self._asif_directory) or not self._asif_directory[t]:
+            return None
+        table = self._asif_tables.get(t)
+        if table is None:
+            g = self._asif_geometry
+            fh = self._handle(0)
+            fh.seek(self._asif_directory[t] * g["chunk"])
+            words = g["table_words"]
+            table = struct.unpack(f">{words}Q", _read_exactly(fh, 8 * words))
+            if len(self._asif_tables) >= 16:
+                self._asif_tables.popitem(last=False)
+            self._asif_tables[t] = table
+        else:
+            self._asif_tables.move_to_end(t)
+        return table
+
+    def _asif_entry(self, table, rel):
+        """(state, chunk number) of the ``rel``-th chunk a table maps, its group's
+        bitmap entry skipped."""
+        per_group = self._asif_geometry["per_group"]
+        group, k = divmod(rel, per_group)
+        entry = table[group * (per_group + 1) + k]
+        return entry >> 62, entry & _ASIF_CHUNK_NUMBER
+
+    def _asif_bitmap(self, t, table, group):
+        key = (t, group)
+        bitmap = self._asif_bitmaps.get(key)
+        if bitmap is None:
+            g = self._asif_geometry
+            number = table[group * (g["per_group"] + 1) + g["per_group"]] & _ASIF_CHUNK_NUMBER
+            name = os.path.basename(self.paths[0])
+            if not number:
+                raise EwfFormatError(f"{name} stores a chunk in part, and its group "
+                                     f"{group:,} of table {t:,} has no bitmap")
+            if (number + 1) * g["chunk"] > g["size"]:
+                raise EwfIncompleteSetError(f"{name} ends inside a block bitmap; the file "
+                                            f"is cut short")
+            fh = self._handle(0)
+            fh.seek(number * g["chunk"])
+            bitmap = _read_exactly(fh, g["chunk"])
+            if len(self._asif_bitmaps) >= 8:
+                self._asif_bitmaps.popitem(last=False)
+            self._asif_bitmaps[key] = bitmap
+        else:
+            self._asif_bitmaps.move_to_end(key)
+        return bitmap
+
+    def _asif_read(self, at, take):
+        """``take`` bytes of the virtual disk from ``at``, which may lie in the reserved
+        area past its end (where the metadata is)."""
+        g = self._asif_geometry
+        chunk = g["chunk"]
+        per_table = g["span"] // chunk
+        out = bytearray()
+        while take > 0:
+            index, within = divmod(at, chunk)
+            part = min(chunk - within, take)
+            t, rel = divmod(index, per_table)
+            out += self._asif_piece(t, rel, within, part)
+            at += part
+            take -= part
+        return bytes(out)
+
+    def _asif_piece(self, t, rel, within, take):
+        """``take`` bytes of the ``rel``-th chunk of table ``t`` from ``within``."""
+        table = self._asif_table(t)
+        if table is None:
+            return bytes(take)
+        state, number = self._asif_entry(table, rel)
+        if state not in (_ASIF_STORED, _ASIF_PARTIAL):
+            return bytes(take)
+        g = self._asif_geometry
+        if state == _ASIF_STORED:
+            return self._asif_stored(number * g["chunk"] + within, take)
+        # Stored in part: only the blocks the group's bitmap marks stored are read;
+        # the others read as zeros, as macOS presents them.
+        group, k = divmod(rel, g["per_group"])
+        bitmap = self._asif_bitmap(t, table, group)
+        block = g["block"]
+        first = k * g["blocks_per_chunk"]
+        out = bytearray()
+        end = within + take
+        at = within
+        while at < end:
+            b = at // block
+            run_end = min(end, (b + 1) * block)
+            stored = (bitmap[(first + b) >> 2] >> (((first + b) & 3) * 2)) & 3 == 1
+            # extend the run over following blocks of the same kind
+            while run_end < end:
+                nb = run_end // block
+                if ((bitmap[(first + nb) >> 2] >> (((first + nb) & 3) * 2)) & 3 == 1) != stored:
+                    break
+                run_end = min(end, (nb + 1) * block)
+            if stored:
+                out += self._asif_stored(number * g["chunk"] + at, run_end - at)
+            else:
+                out += bytes(run_end - at)
+            at = run_end
+        return bytes(out)
+
+    def _asif_stored(self, offset, take):
+        fh = self._handle(0)
+        fh.seek(offset)
+        data = fh.read(take)
+        if len(data) < take:
+            raise EwfIncompleteSetError(f"{os.path.basename(self.paths[0])} ends inside a "
+                                        f"chunk; the file is cut short")
+        return data
+
+    def _chunk_data_asif(self, n):
+        start = n * self.chunk_size
+        return self._asif_read(start, min(self.chunk_size, self.media_size - start))
+
     def _vmdk_find_descriptor(self, path, name):
         """The descriptor file beside a VMDK extent opened on its own: the one text
         descriptor in the same folder whose extent lines name it."""
@@ -7491,6 +7764,8 @@ class EwfImage:
             return self._keep(n, self._chunk_data_vmdk(n), want)
         if self.format == FORMAT_QCOW:
             return self._keep(n, self._chunk_data_qcow(n), want)
+        if self.format == FORMAT_ASIF:
+            return self._keep(n, self._chunk_data_asif(n), want)
 
         segment, start, end, compressed = self._chunk_location(n)
         fh = self._handle(segment)
@@ -7793,6 +8068,7 @@ class EwfImage:
             "vhdx": None if self.vhdx is None else dict(self.vhdx),
             "vmdk": None if self.vmdk is None else dict(self.vmdk),
             "qcow": None if self.qcow is None else dict(self.qcow),
+            "asif": None if self.asif is None else dict(self.asif),
             "ad1": None if self.ad1 is None else {
                 key: value for key, value in self.ad1.items()
                 if key not in ("first_item", "footer")},
@@ -7994,6 +8270,25 @@ def _cmd_info(args):
                     print(f"snapshot        {_shown(snap['name'])} (id {_shown(snap['id'])}), "
                           f"taken {snap['taken']}{', with VM state' if snap['vm_state'] else ''}"
                           f"; not read, the active disk is")
+            elif d["format"] == FORMAT_ASIF:
+                a = d["asif"]
+                print(f"asif version    {a['version']}")
+                print(f"image guid      {a['guid']}")
+                if a["stable_uuid"]:
+                    print(f"stable uuid     {_shown(a['stable_uuid'])}")
+                print(f"chunk size      {a['chunk_size']:,} bytes, blocks of "
+                      f"{a['block_size']:,}")
+                states = ", ".join(f"{count:,} {state}" for state, count in
+                                   a["chunk_states"].items())
+                print(f"chunks          {a['chunks']:,}: {states}")
+                print(f"maximum size    {a['maximum_size']:,} bytes")
+                print(f"directory       version {a['directory_version']:,} of "
+                      f"{', '.join(f'{v:,}' for v in a['directory_versions'])}")
+                if a["user_metadata"]:
+                    for key, value in a["user_metadata"].items():
+                        print(f"user.{_shown(str(key)):<11}{_shown(str(value))}")
+                if a["metadata_error"]:
+                    print(f"metadata        not read: {_shown(a['metadata_error'])}")
             elif d["format"] == FORMAT_VHDX:
                 v = d["vhdx"]
                 print(f"disk type       {v['disk_type']}")
@@ -8270,7 +8565,7 @@ def main(argv=None):
         prog="ewfprobe",
         description="Read an EnCase/EWF (.E01, .Ex01), SMART (.s01), AFF (.aff, "
                     ".afd) or AFF4 (.aff4) forensic image, an Apple disk image (.dmg, .sparseimage, "
-                    ".sparsebundle), a virtual machine disk (.vhd, .vhdx, .vmdk, .qcow2), "
+                    ".sparsebundle), a virtual machine disk (.vhd, .vhdx, .vmdk, .qcow2, .asif), "
                     "an E01, SMART or raw set FTK Imager encrypted "
                     "with AD encryption, or logical evidence: EnCase's (.L01) or "
                     "FTK Imager's (.ad1). Read only.")

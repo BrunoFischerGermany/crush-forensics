@@ -12,6 +12,7 @@ android-backup
 apfs
 apm
 appledouble
+asif
 asl
 atx
 avi

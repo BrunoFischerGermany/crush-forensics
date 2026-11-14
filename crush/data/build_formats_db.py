@@ -4807,6 +4807,56 @@ FORMATS: list[dict[str, Any]] = [
         "last_reviewed": "2026-10-04",
     },
     {
+        "name": "Apple Sparse Image Format (ASIF)",
+        "short_name": "ASIF",
+        "category": "disk_image",
+        #: Format knowledge: optional, doesn't count towards the 90 % for View → Language
+        "forensic_relevance": QT_TRANSLATE_NOOP(
+            "FormatKnowledge",
+            "Apple's sparse disk image format, introduced with macOS 26 Tahoe "
+            "(diskutil image create --format ASIF). Begins 'shdw' and the version, followed "
+            "by two versioned directories of tables mapping the disk in chunks (1 MiB by "
+            "default), with a block bitmap for chunks stored in part; the file grows as the "
+            "disk is written. Apple's Virtualization framework keeps a macOS guest's disk "
+            "in it, so virtual machines of UTM, Tart or Parallels on macOS 26 can hold an "
+            "ASIF behind a .img name. Apple does not document the format. A macOS guest's "
+            "Data volume is encrypted on Apple silicon even without FileVault, with keys "
+            "bound to the virtual machine's hardware.",
+            "Apple Sparse Image Format (ASIF)",
+        ),
+        "platforms": ["macOS"],
+        "parser_class": "RawImageVFS",
+        "magic": [
+            {
+                "offset": 0,
+                "value": b"shdw",
+                #: Format knowledge: optional, doesn't count towards the 90 % for View → Language
+                "description": QT_TRANSLATE_NOOP(
+                    "FormatKnowledge",
+                    "ASIF magic 'shdw', followed by the version (1)",
+                    "Apple Sparse Image Format (ASIF)",
+                ),
+            }
+        ],
+        "extensions": [".asif"],
+        "links": [
+            (
+                "Erik Schamper — Dissecting Apple's Sparse Image Format (ASIF)",
+                "https://schamper.dev/dissecting-apples-sparse-image-format-asif/",
+            ),
+            (
+                "Apple — VZDiskImageStorageDeviceAttachment (Virtualization framework)",
+                "https://developer.apple.com/documentation/virtualization/vzdiskimagestoragedeviceattachment",
+            ),
+            (
+                "abrignoni/ewfprobe — pure-Python reader for EWF (E01, S01, Ex01, L01), AFF/AFF4, AD1 and virtual/Apple disk images",
+                "https://github.com/abrignoni/ewfprobe",
+            ),
+        ],
+        "status": "reviewed",
+        "last_reviewed": "2026-11-14",
+    },
+    {
         "name": "EnCase Logical Evidence",
         "short_name": "L01",
         "category": "logical_image",
